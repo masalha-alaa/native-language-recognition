@@ -1,3 +1,6 @@
 /.idea
 /venv
 *.pkl
+/__pycache__
+clean
+raw
