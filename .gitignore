@@ -4,3 +4,5 @@
 /__pycache__
 clean
 raw
+sentences
+tokens
