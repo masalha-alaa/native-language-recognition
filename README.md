@@ -1,6 +1,5 @@
-1. fetch_data
-2. extract_data (only if save_txt was False in 'fetch_data')
+1. fetch_data.py
+2. extract_data.py (only if 'save_txt' was False in 'fetch_data.py')
 3. Manually clean out (merge etc.)
-4. 
-
- 
+4. preprocessing.py
+5. data_representation.py 
