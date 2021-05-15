@@ -73,7 +73,7 @@ if __name__ == '__main__':
     SHOW_IMAGES = True
 
     input_dir = SENTENCES_DIR
-    chunks_input_dir = CHUNKS_DIR
+    chunks_input_dir = TOKEN_CHUNKS_DIR
     output_dir = IMAGES_DIR
 
     print('Sentences count...')

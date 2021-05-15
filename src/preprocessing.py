@@ -10,9 +10,10 @@ from datetime import datetime
 import re
 import nltk
 from pickle import dump
+from multiprocessing import Pool
 
 
-def clean_line(line):
+def clean_a_line(line):
     def remove_emojis(text):
         return emoji.get_emoji_regexp().sub(r'', text)
 
@@ -29,7 +30,7 @@ def clean_data(input_dir, output_dir):
             with open(input_dir / filename, mode='r', encoding='utf-8') as fr:
                 with open(output_dir / filename, mode='w', encoding='utf-8') as fw:
                     for line in fr.readlines():
-                        clean_line = clean_line(line)
+                        clean_line = clean_a_line(line)
                         if clean_line:
                             fw.write(f'{clean_line}\n')
 
@@ -57,6 +58,16 @@ def tokenize_data(input_dir, output_dir):
                         fw.write(f"{' '.join(nltk.word_tokenize(sentence))}\n")
 
 
+def posify_data(params):
+    input_dir, input_files, output_dir = params
+    for filename in input_files:
+        if filename.endswith('.txt'):
+            print(filename)
+            with open(output_dir / filename, mode='w', encoding='utf-8') as fw:
+                fw.writelines('\n'.join([' '.join([pair[1] for pair in nltk.pos_tag(line.split())])
+                                         for line in open(input_dir / filename, mode='r', encoding='utf-8').readlines()]))
+
+
 def chunkify_data(input_dir, output_dir, minimum_tokens_in_sentence=3, chunk_size=2000):
     for i, filename in enumerate(os.listdir(input_dir)):
         if filename.endswith('.txt'):
@@ -80,15 +91,20 @@ if __name__ == '__main__':
     CLEAN = False
     SENTENCIZE = False
     TOKENIZE = False
-    CHUNKIFY = True
+    CHUNKIFY_TOKENS = False
+    POSIFY = False
+    CHUNKIFY_POS = True
 
     ts = datetime.now()
+    print(ts)
 
     input_dir = RAW_DATA_DIR
     clean_output_dir = CLEAN_DATA_DIR
     sentences_output_dir = SENTENCES_DIR
     tokens_output_dir = TOKENS_DIR
-    chunks_output_dir = CHUNKS_DIR
+    tokens_chunks_output_dir = TOKEN_CHUNKS_DIR
+    pos_chunks_output_dir = POS_CHUNKS_DIR
+    pos_output_dir = POS_DIR
 
     if CLEAN:
         print('Cleaning...')
@@ -105,10 +121,31 @@ if __name__ == '__main__':
         tokens_output_dir.mkdir(exist_ok=True)
         tokenize_data(sentences_output_dir, tokens_output_dir)
 
-    if CHUNKIFY:
-        print('Chunkifying...')
-        chunks_output_dir.mkdir(exist_ok=True)
-        chunkify_data(tokens_output_dir, chunks_output_dir)
+    if POSIFY:
+        # Note: Very slow => On 6 CPUs it takes 11 minutes.
+        print('Posifying ', end='')
+        pos_output_dir.mkdir(exist_ok=True)
+        tokenized_files = [f for f in os.listdir(tokens_output_dir) if f.endswith('.txt')]
+        print(f'{len(tokenized_files)} files...')
+        pools = 6
+        pool = Pool(pools)
+        file_groups = [(input_dir, lst_of_files, output_dir) for input_dir, output_dir, lst_of_files in
+                       zip([tokens_output_dir] * pools,
+                           [pos_output_dir] * pools,
+                           [tokenized_files[i: i+(len(tokenized_files)//(pools-1))]
+                            for i in range(0, len(tokenized_files), len(tokenized_files)//(pools-1))])]
+        assert len(file_groups) <= pools
+        pool.map(posify_data, file_groups)
+
+    if CHUNKIFY_TOKENS:
+        print('Chunkifying tokens...')
+        tokens_chunks_output_dir.mkdir(exist_ok=True)
+        chunkify_data(tokens_output_dir, tokens_chunks_output_dir)
+
+    if CHUNKIFY_POS:
+        print('Chunkifying POS...')
+        pos_chunks_output_dir.mkdir(exist_ok=True)
+        chunkify_data(pos_output_dir, pos_chunks_output_dir)
 
     print('')
     print(datetime.now() - ts)

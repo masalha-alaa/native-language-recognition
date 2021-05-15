@@ -3,7 +3,10 @@
 *.pkl
 /__pycache__
 clean
+features
+pos
+pos_chunks_2000
 raw
 sentences
+token_chunks_2000
 tokens
-*.pkl_lst
