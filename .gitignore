@@ -6,3 +6,4 @@ clean
 raw
 sentences
 tokens
+*.pkl_lst

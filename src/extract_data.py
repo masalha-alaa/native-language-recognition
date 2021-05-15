@@ -1,15 +1,14 @@
 """
 Extract fetched data from pkl file.
 """
-from paths import ROOT_DIR
-from pathlib import Path
+from paths import *
 from pickle import load
 
 
 if __name__ == '__main__':
-    input_dir = Path(ROOT_DIR) / "dataset 2021-05-13 11-54-00"
+    input_dir = DB_DIR
     input_file = 'data_dict.pkl'
-    output_dir = input_dir / 'raw'
+    output_dir = RAW_DATA_DIR
 
     with open(input_dir / input_file, mode='rb') as f:
         data = load(f)
