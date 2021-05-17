@@ -12,13 +12,13 @@ import plotly.express as px
 
 
 def k_most_common(input_dir, k=1000):
-    top_k = Counter(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read()
+    top_k = Counter(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read().lower()
                             for filename in os.listdir(input_dir)).split())
     return top_k.most_common(k)
 
 
 def k_most_common_trigrams(input_dir, k=1000):
-    top_k = FreqDist(ngrams(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read()
+    top_k = FreqDist(ngrams(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read().lower()
                                     for filename in os.listdir(input_dir)).split(), 3))
     return top_k.most_common(k)
 
@@ -35,18 +35,20 @@ def plot_interactive(title, x, y, x_label, y_label, xticks_rot=0, show=True, sav
 
 
 if __name__ == '__main__':
-    SHOW_GRAPH = True
+    SHOW_GRAPH = False
     SAVE_GRAPH = True
     WORDS = True
     WORDS_NGRAMS = True
     POS = True
     POS_NGRAMS = True
 
-    print(datetime.now())
+    begin_ts = datetime.now()
+    print(begin_ts)
 
     tokens_input_dir = TOKENS_DIR
     pos_input_dir = POS_DIR
     output_dir = FEATURES_DIR
+    output_dir.mkdir(exist_ok=True)
 
     # build K most common words
     if WORDS:
@@ -116,4 +118,4 @@ if __name__ == '__main__':
                              'ngram', 'count', xticks_rot=270,
                              show=SHOW_GRAPH, save=SAVE_GRAPH)
 
-    print(datetime.now())
+    print(f'\nTOTAL TIME: {datetime.now() - begin_ts}')

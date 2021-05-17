@@ -1,6 +1,7 @@
 /.idea
 /venv
 *.pkl
+*.pkl_dic
 /__pycache__
 clean
 features
