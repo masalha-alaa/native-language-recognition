@@ -4,7 +4,6 @@ Data visualization in graphs etc.
 
 import matplotlib.pyplot as plt
 from paths import *
-from common import *
 import os
 import re
 import numpy as np

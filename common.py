@@ -7,6 +7,7 @@ PKL_DIC_EXT = '.pkl_dic'
 LOG_EXT = '.log'
 # NATIVE_COUNTRIES = {'Australia', 'England', 'UK', 'US'}
 NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK', 'New Zealand', 'US'}
+# NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK', 'US'}
 
 
 def print_log(msg, filename=None, to_console=True):

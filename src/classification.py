@@ -1,5 +1,5 @@
 from paths import *
-from common import *
+from enum import Enum
 import random
 import os
 from pickle import load
@@ -59,7 +59,13 @@ def refine_vocabulary(vocabulary):
     """
     Extract words from (word, count) list.
     """
-    return [pair[0] for pair in vocabulary]
+    if isinstance(vocabulary[0], tuple):
+        if isinstance(vocabulary[0][0], tuple):
+            return [' '.join(pair[0]) for pair in vocabulary]
+        else:
+            return [pair[0] for pair in vocabulary]
+    else:
+        return vocabulary
 
 
 def plot_confusion_matrix(cm, classes,
@@ -114,7 +120,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, plot_cm=True):
         y = dataframe.iloc[-1].values
 
     classifiers = [(SVC(), False),
-                   (LogisticRegression(max_iter=300), True),
+                   (LogisticRegression(max_iter=400), True),
                    (MultinomialNB(), False),
                    (RandomForestClassifier(), False),
                    (KNeighborsClassifier(), False)]
@@ -175,26 +181,48 @@ def classify(clf, K, X, y, plot_cm):
     return scores
 
 
+class FeatureVector(Enum):
+    ONE_K_WORDS = 1
+    ONE_K_POS_TRI = 2
+    FUNCTION_WORDS = 3
+
+
 if __name__ == '__main__':
     NATIVE = 1
     NON_NATIVE = 0
+    binary = True
+
+    # feature_vector = FeatureVector.ONE_K_WORDS
+    # feature_vector = FeatureVector.ONE_K_POS_TRI
+    feature_vector = FeatureVector.FUNCTION_WORDS
+
+    if feature_vector == FeatureVector.ONE_K_WORDS:
+        feature_vector_path = FeatureVectors.ONE_THOUSAND_WORDS
+        chunks_dir = TOKEN_CHUNKS_DIR
+        NGRAMS = (1, 1)
+    elif feature_vector == FeatureVector.ONE_K_POS_TRI:
+        feature_vector_path = FeatureVectors.ONE_THOUSAND_POS_TRI
+        chunks_dir = POS_CHUNKS_DIR
+        NGRAMS = (3, 3)
+    else:  # FUNCTION_WORDS
+        feature_vector_path = FeatureVectors.FUNCTION_WORDS
+        chunks_dir = TOKEN_CHUNKS_DIR
+        NGRAMS = (1, 1)
 
     ts = datetime.now()
     print('Program started')
     print(ts)
 
     random.seed(42)
-    chunks_dir = TOKEN_CHUNKS_DIR
 
     native_chunks, non_native_chunks = get_native_non_native_classes(chunks_dir)
     df = pd.DataFrame(data=native_chunks + non_native_chunks, columns=['chunks'])
     df['label'] = [NATIVE] * len(native_chunks) + [NON_NATIVE] * len(non_native_chunks)
     df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
-    with open(FEATURES_DIR / '1000 most common words.pkl_lst', mode='rb') as f:
+    with open(FEATURES_DIR / feature_vector_path, mode='rb') as f:
         vocabulary = refine_vocabulary(load(f))
-    NGRAMS = (1, 1)
-    binary = True
+
     count_vec = CountVectorizer(vocabulary=vocabulary, ngram_range=NGRAMS, binary=binary)
     ftr_table = count_vec.fit_transform(df['chunks'])
 

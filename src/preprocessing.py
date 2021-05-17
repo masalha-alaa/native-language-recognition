@@ -2,7 +2,6 @@
 Clean the data
 """
 from paths import *
-from common import *
 import os
 import emoji
 import string

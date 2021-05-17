@@ -2,7 +2,6 @@
 Extract already fetched data from pkl file.
 """
 from paths import *
-from common import *
 from pickle import load
 
 

@@ -5,6 +5,7 @@ Common paths.
 
 import os
 from pathlib import Path
+from common import *
 
 ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,4 +21,11 @@ SENTENCES_DIR = DB_DIR / "sentences"
 TOKENS_DIR = DB_DIR / "tokens"
 POS_DIR = DB_DIR / "pos"
 FEATURES_DIR = DB_DIR / 'features'
+COMMON_FEATURES_DIR = ROOT_DIR / 'common features'
 IMAGES_DIR = DB_DIR / "images"
+
+
+class FeatureVectors:
+    ONE_THOUSAND_WORDS = FEATURES_DIR / f"1000 most common words{PKL_LST_EXT}"
+    ONE_THOUSAND_POS_TRI = FEATURES_DIR / f"1000 most common POS trigrams{PKL_LST_EXT}"
+    FUNCTION_WORDS = COMMON_FEATURES_DIR / f"en_function_words{PKL_LST_EXT}"

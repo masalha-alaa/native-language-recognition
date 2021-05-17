@@ -3,12 +3,12 @@ Builds features from data.
 """
 
 from paths import *
-from common import *
 from collections import Counter
 from datetime import datetime
 from pickle import dump
 from nltk import ngrams,FreqDist
 import plotly.express as px
+from shutil import copyfile
 
 
 def k_most_common(input_dir, k=1000):
@@ -49,6 +49,8 @@ if __name__ == '__main__':
     pos_input_dir = POS_DIR
     output_dir = FEATURES_DIR
     output_dir.mkdir(exist_ok=True)
+
+    # function words list is common for all DBs, and is present in the common features dir.
 
     # build K most common words
     if WORDS:
