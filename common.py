@@ -6,7 +6,7 @@ PKL_LST_EXT = '.pkl_lst'
 PKL_DIC_EXT = '.pkl_dic'
 LOG_EXT = '.log'
 # NATIVE_COUNTRIES = {'Australia', 'England', 'UK', 'US'}
-NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK', 'New Zealand', 'US'}
+NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK', 'New Zealand', 'US', 'Canada'}
 # NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK', 'US'}
 
 

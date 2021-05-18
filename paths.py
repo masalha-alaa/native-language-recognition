@@ -10,8 +10,8 @@ from common import *
 ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 CONTROL_DB = 'dataset control db'
-DB_DIR = ROOT_DIR / "dataset 2021-05-16 16-56-59"
-# DB_DIR = ROOT_DIR / CONTROL_DB
+# DB_DIR = ROOT_DIR / "dataset 2021-05-16 16-56-59"
+DB_DIR = ROOT_DIR / CONTROL_DB
 TOKEN_CHUNKS_DIR = DB_DIR / "token_chunks_2000"
 POS_CHUNKS_DIR = DB_DIR / "pos_chunks_2000"
 RAW_DIR_NAME = 'raw'
@@ -25,7 +25,7 @@ COMMON_FEATURES_DIR = ROOT_DIR / 'common features'
 IMAGES_DIR = DB_DIR / "images"
 
 
-class FeatureVectors:
+class FeatureVectorPaths:
     ONE_THOUSAND_WORDS = FEATURES_DIR / f"1000 most common words{PKL_LST_EXT}"
     ONE_THOUSAND_POS_TRI = FEATURES_DIR / f"1000 most common POS trigrams{PKL_LST_EXT}"
     FUNCTION_WORDS = COMMON_FEATURES_DIR / f"en_function_words{PKL_LST_EXT}"

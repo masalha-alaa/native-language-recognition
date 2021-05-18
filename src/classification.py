@@ -1,5 +1,4 @@
-from paths import *
-from enum import Enum
+from src.model_configuration import *
 import random
 import os
 from pickle import load
@@ -9,7 +8,6 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import itertools
 from sklearn.metrics import confusion_matrix
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.naive_bayes import MultinomialNB
@@ -53,19 +51,6 @@ def get_native_non_native_classes(input_path, max_chunks_per_non_native_country=
         non_native_chunks = random.sample(non_native_chunks, chunks_per_class)
 
     return native_chunks, non_native_chunks
-
-
-def refine_vocabulary(vocabulary):
-    """
-    Extract words from (word, count) list.
-    """
-    if isinstance(vocabulary[0], tuple):
-        if isinstance(vocabulary[0][0], tuple):
-            return [' '.join(pair[0]) for pair in vocabulary]
-        else:
-            return [pair[0] for pair in vocabulary]
-    else:
-        return vocabulary
 
 
 def plot_confusion_matrix(cm, classes,
@@ -181,33 +166,9 @@ def classify(clf, K, X, y, plot_cm):
     return scores
 
 
-class FeatureVector(Enum):
-    ONE_K_WORDS = 1
-    ONE_K_POS_TRI = 2
-    FUNCTION_WORDS = 3
-
-
 if __name__ == '__main__':
     NATIVE = 1
     NON_NATIVE = 0
-    binary = True
-
-    # feature_vector = FeatureVector.ONE_K_WORDS
-    # feature_vector = FeatureVector.ONE_K_POS_TRI
-    feature_vector = FeatureVector.FUNCTION_WORDS
-
-    if feature_vector == FeatureVector.ONE_K_WORDS:
-        feature_vector_path = FeatureVectors.ONE_THOUSAND_WORDS
-        chunks_dir = TOKEN_CHUNKS_DIR
-        NGRAMS = (1, 1)
-    elif feature_vector == FeatureVector.ONE_K_POS_TRI:
-        feature_vector_path = FeatureVectors.ONE_THOUSAND_POS_TRI
-        chunks_dir = POS_CHUNKS_DIR
-        NGRAMS = (3, 3)
-    else:  # FUNCTION_WORDS
-        feature_vector_path = FeatureVectors.FUNCTION_WORDS
-        chunks_dir = TOKEN_CHUNKS_DIR
-        NGRAMS = (1, 1)
 
     ts = datetime.now()
     print('Program started')
@@ -215,16 +176,24 @@ if __name__ == '__main__':
 
     random.seed(42)
 
+    # =======> Choose feature vector type <=======
+    # feature_vector_type = FeatureVectorType.ONE_K_WORDS
+    # feature_vector_type = FeatureVectorType.ONE_K_POS_TRI
+    feature_vector_type = FeatureVectorType.FUNCTION_WORDS
+
+    # =======> Choose feature vector values <=======
+    # feature_vector_values = FeatureVectorValues.BINARY
+    # feature_vector_values = FeatureVectorValues.FREQUENCY
+    feature_vector_values = FeatureVectorValues.TFIDF
+
+    vectorizer, chunks_dir = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
+
     native_chunks, non_native_chunks = get_native_non_native_classes(chunks_dir)
     df = pd.DataFrame(data=native_chunks + non_native_chunks, columns=['chunks'])
     df['label'] = [NATIVE] * len(native_chunks) + [NON_NATIVE] * len(non_native_chunks)
     df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
-    with open(FEATURES_DIR / feature_vector_path, mode='rb') as f:
-        vocabulary = refine_vocabulary(load(f))
-
-    count_vec = CountVectorizer(vocabulary=vocabulary, ngram_range=NGRAMS, binary=binary)
-    ftr_table = count_vec.fit_transform(df['chunks'])
+    ftr_table = vectorizer.fit_transform(df['chunks'])
 
     run_classifiers(X=ftr_table, y=df['label'].values)
 
