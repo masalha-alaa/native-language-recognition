@@ -1,4 +1,5 @@
 import argparse
+from bisect import bisect_left
 from src.model_configuration import *
 from src.data_picker import *
 import pandas as pd
@@ -50,7 +51,8 @@ def plot_confusion_matrix(cm, classes,
 
 
 def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
-                    verbose=1, results_path=None, plots_path=None):
+                    verbose=1, results_path=None, plots_path=None,
+                    cm_title='Confusion Matrix'):
     """
     Runs multiple classifiers on data in dataFrame (or in X/Y if given) and prints the results.
     Classifiers: SVM , LR, NB , Decision Tree , KNN
@@ -62,6 +64,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
     :param verbose: Debug level
     :param results_path: Path to save results (only if verbose > 2)
     :param plots_path: Path to save plots (only if verbose > 2)
+    :param cm_title: Confusion matrix title
     :return: None
     """
 
@@ -86,6 +89,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
                 print_log(clf.__class__.__name__, end=' ', file=results_path)
 
             scores_, all_actual, all_predicted = classify(clf, k_fold, X, y)
+            scores_avg = np.mean(scores_)
             scores[clf.__class__.__name__] = scores_
 
             if verbose > 1:
@@ -98,7 +102,10 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
                     np.set_printoptions(precision=2)
                     # Plot non-normalized confusion matrix
                     fig = plt.figure()
-                    plot_confusion_matrix(cnf_matrix, classes=classes, title='Confusion matrix', normalize=False)
+                    plot_confusion_matrix(cnf_matrix,
+                                          classes=classes,
+                                          title=f'{cm_title}\nAccuracy: {scores_avg*100:.1f}%',
+                                          normalize=False)
 
                     print_log('-> Exit plot window to continue...')
 
@@ -112,7 +119,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
 
             if verbose > 0:
                 print_log(scores_, file=results_path)
-                print_log(f'avg: {round(np.mean(scores_) * 100, 2)}%\n', file=results_path)
+                print_log(f'avg: {round(scores_avg * 100, 2)}%\n', file=results_path)
 
     return scores
 
@@ -146,9 +153,24 @@ def classify(clf, K, X, y):
     return scores, all_actual, all_predicted
 
 
+def sort_a_by_b(a, b):
+    res = []
+    a_sorted = sorted(a)
+    for item in b:
+        found = bisect_left(a_sorted, item)
+        if found < len(a_sorted) and a_sorted[found] == item:
+            del a_sorted[found]
+            res.append(item)
+
+    for item in a_sorted:
+        res.append(item)
+
+    return res
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument("-v", "--verbose", default=0, type=int, help="Verbose level [0-3]")
+    ap.add_argument("-v", "--verbose", default=3, type=int, help="Verbose level [0-3]")
     args = vars(ap.parse_args())
     verbose = args['verbose']
 
@@ -163,27 +185,38 @@ if __name__ == '__main__':
 
     # =======> Choose data type <=======
     # data_type = ClassesType.BINARY_NATIVITY
-    data_type = ClassesType.NATIVE_LANGUAGE_IDENTIFICATION
+    data_type = ClassesType.COUNTRY_IDENTIFICATION
     # data_type = ClassesType.LANGUAGE_FAMILY
 
     # =======> Choose feature vector type <=======
-    feature_vector_type = FeatureVectorType.ONE_K_WORDS
+    # feature_vector_type = FeatureVectorType.ONE_K_WORDS
     # feature_vector_type = FeatureVectorType.ONE_K_POS_TRI
-    # feature_vector_type = FeatureVectorType.FUNCTION_WORDS
+    feature_vector_type = FeatureVectorType.FUNCTION_WORDS
 
     # =======> Choose feature vector values <=======
     # feature_vector_values = FeatureVectorValues.BINARY
     # feature_vector_values = FeatureVectorValues.FREQUENCY
     feature_vector_values = FeatureVectorValues.TFIDF
 
+    if data_type == ClassesType.BINARY_NATIVITY:
+        chunks_per_class = 500
+    elif data_type == ClassesType.COUNTRY_IDENTIFICATION:
+        chunks_per_class = 50
+    elif data_type == ClassesType.LANGUAGE_FAMILY:
+        chunks_per_class = 75
+    else:
+        raise NotImplementedError
+
+    config = f'{data_type}\n{feature_vector_type}\n{feature_vector_values}\n{chunks_per_class} chunks per class'
+    print(config)
     if verbose > 0 and results_path:
         with open(results_path, mode='a', encoding='utf8') as f:
-            f.write(f'{data_type.name}\n{feature_vector_type.name}\n{feature_vector_values.name}\n')
+            f.write(f'{config}\n')
 
     print('Collecting data...', end=' ')
     ts = datetime.now()
     vectorizer, chunks_dir = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
-    df = DataPicker.get_data(data_type, chunks_dir)
+    df = DataPicker.get_data(data_type, chunks_dir, chunks_per_class)
     print(f'({datetime.now() - ts})')
 
     print('Constructing features...', end=' ')
@@ -194,6 +227,8 @@ if __name__ == '__main__':
     print('Classifying...')
     scores_dict = run_classifiers(X=ftr_table, y=df['label'].values, verbose=verbose,
                                   results_path=results_path,
-                                  plots_path=plots_path)
+                                  plots_path=plots_path,
+                                  classes=sort_a_by_b(pd.unique(df['label']), COUNTRIES_ORDER),
+                                  cm_title=config)
 
     print(f'\nTOTAL TIME: {datetime.now() - ts}')

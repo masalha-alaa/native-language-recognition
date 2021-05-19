@@ -4,12 +4,11 @@ import random
 from pickle import load
 from enum import Enum
 import pandas as pd
-from datetime import datetime
 
 
 class ClassesType(Enum):
     BINARY_NATIVITY = 1
-    NATIVE_LANGUAGE_IDENTIFICATION = 2  # NLI
+    COUNTRY_IDENTIFICATION = 2  # NLI
     LANGUAGE_FAMILY = 3
 
 
@@ -69,13 +68,13 @@ class DataPicker:
         return d
 
     @staticmethod
-    def get_data(classes_type: ClassesType, chunks_dir):
+    def get_data(classes_type: ClassesType, chunks_dir, chunks_per_class):
         if classes_type == ClassesType.BINARY_NATIVITY:
-            native_chunks, non_native_chunks = DataPicker._get_native_non_native_classes(chunks_dir)
+            native_chunks, non_native_chunks = DataPicker._get_native_non_native_classes(chunks_dir, max_chunks_per_class=chunks_per_class)
             df = pd.DataFrame(data=native_chunks + non_native_chunks, columns=['chunks'])
             df['label'] = [DataPicker.NATIVE] * len(native_chunks) + [DataPicker.NON_NATIVE] * len(non_native_chunks)
-        elif classes_type == ClassesType.NATIVE_LANGUAGE_IDENTIFICATION:
-            countries = DataPicker._get_country_classes(chunks_dir)
+        elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
+            countries = DataPicker._get_country_classes(chunks_dir, chunks_per_class)
             df = pd.DataFrame(data=sum(countries.values(), []), columns=['chunks'])
             df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
         elif classes_type == ClassesType.LANGUAGE_FAMILY:
