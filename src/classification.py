@@ -1,7 +1,6 @@
+import argparse
 from src.model_configuration import *
-import random
-import os
-from pickle import load
+from src.data_picker import *
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -17,42 +16,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 
 
-def sample_random_chunks(filepath, max_chunks=-1):
-    chunks = []
-    with open(filepath, mode='rb') as f:
-        chunks = load(f)
-        chunks = random.sample(chunks,
-                               len(chunks) if max_chunks == -1
-                               else max_chunks if max_chunks < len(chunks)
-                               else len(chunks))
-    return [random.sample(chunk, len(chunk)) for chunk in chunks]
-
-
-def get_native_non_native_classes(input_path, max_chunks_per_non_native_country=50, max_chunks_per_class=500):
-    native_chunks = []
-    non_native_chunks = []
-    for chunks_file in os.listdir(input_path):
-        if chunks_file.endswith(PKL_LST_EXT):
-            is_native = chunks_file.replace(PKL_LST_EXT, '') in NATIVE_COUNTRIES
-
-            chunks = sample_random_chunks(input_path / chunks_file,
-                                          -1 if is_native else max_chunks_per_non_native_country)
-            chunks = [''.join(chunk) for chunk in chunks]  # convert each chunk to one long string.
-
-            if is_native:
-                native_chunks.extend(chunks)
-            else:
-                non_native_chunks.extend(chunks)
-
-    chunks_per_class = min(max_chunks_per_class, len(native_chunks), len(non_native_chunks))
-    if len(native_chunks) > chunks_per_class:
-        native_chunks = random.sample(native_chunks, chunks_per_class)
-    if len(non_native_chunks) > chunks_per_class:
-        non_native_chunks = random.sample(non_native_chunks, chunks_per_class)
-
-    return native_chunks, non_native_chunks
-
-
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion Matrix',
@@ -65,7 +28,7 @@ def plot_confusion_matrix(cm, classes,
     plt.title(title)
     tick_marks = np.arange(len(classes))
     plt.tick_params(labelright=True)
-    plt.xticks(tick_marks, classes, rotation=45)
+    plt.xticks(tick_marks, classes, rotation=90)
     plt.yticks(tick_marks, classes)
 
     if normalize:
@@ -74,8 +37,7 @@ def plot_confusion_matrix(cm, classes,
     else:
         print('Drawing confusion matrix, without normalization...')
 
-    # thresh = cm.max() / 2.
-    thresh = 300
+    thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(j, i, cm[i, j],
                  ha="center",
@@ -87,7 +49,8 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, plot_cm=True):
+def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
+                    verbose=1, results_path=None, plots_path=None):
     """
     Runs multiple classifiers on data in dataFrame (or in X/Y if given) and prints the results.
     Classifiers: SVM , LR, NB , Decision Tree , KNN
@@ -95,7 +58,10 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, plot_cm=True):
     :param X: Data (dataframe is ignored if this is given)
     :param y: Labels (dataframe is ignored if this is given)
     :param k_fold: K Fold for cross validation.
-    :param plot_cm: Whether to draw a confusion matrix or not.
+    :param classes: Classes list for cm. If None, the classes will be inferred from the order in the labels column.
+    :param verbose: Debug level
+    :param results_path: Path to save results (only if verbose > 2)
+    :param plots_path: Path to save plots (only if verbose > 2)
     :return: None
     """
 
@@ -104,27 +70,60 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, plot_cm=True):
         X = dataframe.iloc[:, :len(dataframe.columns) - 1].copy().values
         y = dataframe.iloc[-1].values
 
+    if classes is None:
+        classes = pd.unique(y)
+
     classifiers = [(SVC(), False),
-                   (LogisticRegression(max_iter=400), True),
+                   (LogisticRegression(max_iter=500), True),
                    (MultinomialNB(), False),
                    (RandomForestClassifier(), False),
                    (KNeighborsClassifier(), False)]
+    scores = {}
     for clf, run in classifiers:
         if run:
-            print(clf.__class__.__name__)
-            scores = classify(clf, k_fold, X, y, plot_cm)
-            print(scores)
-            print(f'avg: {round(np.mean(scores) * 100, 2)}%\n')
+            if verbose > 1:
+                classification_ts = datetime.now()
+                print_log(clf.__class__.__name__, end=' ', file=results_path)
+
+            scores_, all_actual, all_predicted = classify(clf, k_fold, X, y)
+            scores[clf.__class__.__name__] = scores_
+
+            if verbose > 1:
+                print_log(f'({datetime.now() - classification_ts})', file=results_path)
+
+                if verbose > 2:
+                    print_log('Plotting confusion matrix...')
+                    # Compute total confusion matrix
+                    cnf_matrix = confusion_matrix(all_actual, all_predicted, labels=classes)
+                    np.set_printoptions(precision=2)
+                    # Plot non-normalized confusion matrix
+                    fig = plt.figure()
+                    plot_confusion_matrix(cnf_matrix, classes=classes, title='Confusion matrix', normalize=False)
+
+                    print_log('-> Exit plot window to continue...')
+
+                    if plots_path:
+                        # fig.set_size_inches((4, 3), forward=False)
+                        fig.set_size_inches((0.22 * len(classes) + 3.8, 0.16 * len(classes) + 2.8), forward=False)
+                        plt.savefig(plots_path / f'cm {datetime.now().strftime(DATE_STR_SHORT)}.png',
+                                    bbox_inches='tight', dpi=170)
+                    plt.show()
+                    plt.close()
+
+            if verbose > 0:
+                print_log(scores_, file=results_path)
+                print_log(f'avg: {round(np.mean(scores_) * 100, 2)}%\n', file=results_path)
+
+    return scores
 
 
-def classify(clf, K, X, y, plot_cm):
+def classify(clf, K, X, y):
     """
     Classifies data X, and returns the results
     :param clf: The classifier ( for example sk.svm.SVC() )
     :param K: K-Fold for cross validation
     :param X: The data
     :param y: The targets
-    :param plot_cm: Whether to draw a confusion matrix or not.
     :return: List of K scores after cross validation
     """
 
@@ -141,60 +140,60 @@ def classify(clf, K, X, y, plot_cm):
         actual = y[test]
         scores.extend([accuracy_score(actual, predicted)])
         # gather all predicted and actual for building confusion matrix
-        if plot_cm:
-            all_predicted.extend(predicted)
-            all_actual.extend(actual)
-    if plot_cm:
-        print('Plotting confusion matrix...')
-        # Compute total confusion matrix
-        cnf_matrix = confusion_matrix(all_actual, all_predicted)
-        np.set_printoptions(precision=2)
-        # Plot non-normalized confusion matrix
-        plt.figure()
-        plot_confusion_matrix(cnf_matrix,
-                              classes=sorted([NATIVE, NON_NATIVE]),
-                              title='Confusion matrix')
+        all_predicted.extend(predicted)
+        all_actual.extend(actual)
 
-        # Plot normalized confusion matrix
-        # plt.figure()
-        # plot_confusion_matrix(cnf_matrix, classes=['Native', 'Non-Native'], normalize=True,
-        #                       title='Normalized confusion matrix')
-
-        print('-> Exit plot window to continue...')
-        plt.show()
-
-    return scores
+    return scores, all_actual, all_predicted
 
 
 if __name__ == '__main__':
-    NATIVE = 1
-    NON_NATIVE = 0
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-v", "--verbose", default=0, type=int, help="Verbose level [0-3]")
+    args = vars(ap.parse_args())
+    verbose = args['verbose']
 
-    ts = datetime.now()
+    results_path = RESULTS_DIR
+
     print('Program started')
+    ts = datetime.now()
     print(ts)
+    results_path.mkdir(exist_ok=True)
+    plots_path = results_path
+    results_path /= f'results {ts.strftime(DATE_STR_SHORT)}.txt'
 
-    random.seed(42)
+    # =======> Choose data type <=======
+    # data_type = ClassesType.BINARY_NATIVITY
+    data_type = ClassesType.NATIVE_LANGUAGE_IDENTIFICATION
+    # data_type = ClassesType.LANGUAGE_FAMILY
 
     # =======> Choose feature vector type <=======
-    # feature_vector_type = FeatureVectorType.ONE_K_WORDS
+    feature_vector_type = FeatureVectorType.ONE_K_WORDS
     # feature_vector_type = FeatureVectorType.ONE_K_POS_TRI
-    feature_vector_type = FeatureVectorType.FUNCTION_WORDS
+    # feature_vector_type = FeatureVectorType.FUNCTION_WORDS
 
     # =======> Choose feature vector values <=======
     # feature_vector_values = FeatureVectorValues.BINARY
     # feature_vector_values = FeatureVectorValues.FREQUENCY
     feature_vector_values = FeatureVectorValues.TFIDF
 
+    if verbose > 0 and results_path:
+        with open(results_path, mode='a', encoding='utf8') as f:
+            f.write(f'{data_type.name}\n{feature_vector_type.name}\n{feature_vector_values.name}\n')
+
+    print('Collecting data...', end=' ')
+    ts = datetime.now()
     vectorizer, chunks_dir = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
+    df = DataPicker.get_data(data_type, chunks_dir)
+    print(f'({datetime.now() - ts})')
 
-    native_chunks, non_native_chunks = get_native_non_native_classes(chunks_dir)
-    df = pd.DataFrame(data=native_chunks + non_native_chunks, columns=['chunks'])
-    df['label'] = [NATIVE] * len(native_chunks) + [NON_NATIVE] * len(non_native_chunks)
-    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
-
+    print('Constructing features...', end=' ')
+    ts = datetime.now()
     ftr_table = vectorizer.fit_transform(df['chunks'])
+    print(f'({datetime.now() - ts})')
 
-    run_classifiers(X=ftr_table, y=df['label'].values)
+    print('Classifying...')
+    scores_dict = run_classifiers(X=ftr_table, y=df['label'].values, verbose=verbose,
+                                  results_path=results_path,
+                                  plots_path=plots_path)
 
-    print(datetime.now() - ts)
+    print(f'\nTOTAL TIME: {datetime.now() - ts}')

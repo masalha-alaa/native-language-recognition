@@ -10,8 +10,8 @@ from common import *
 ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 CONTROL_DB = 'dataset control db'
-# DB_DIR = ROOT_DIR / "dataset 2021-05-16 16-56-59"
-DB_DIR = ROOT_DIR / CONTROL_DB
+DB_DIR = ROOT_DIR / "dataset 2021-05-16 16-56-59"
+# DB_DIR = ROOT_DIR / CONTROL_DB
 TOKEN_CHUNKS_DIR = DB_DIR / "token_chunks_2000"
 POS_CHUNKS_DIR = DB_DIR / "pos_chunks_2000"
 RAW_DIR_NAME = 'raw'
@@ -23,6 +23,7 @@ POS_DIR = DB_DIR / "pos"
 FEATURES_DIR = DB_DIR / 'features'
 COMMON_FEATURES_DIR = ROOT_DIR / 'common features'
 IMAGES_DIR = DB_DIR / "images"
+RESULTS_DIR = DB_DIR / "results"
 
 
 class FeatureVectorPaths:

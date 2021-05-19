@@ -135,6 +135,8 @@ if __name__ == '__main__':
         sentecize_data(clean_output_dir, sentences_output_dir)
         print(f'{datetime.now()}\n')
 
+    # TODO: Should shuffle here
+
     if TOKENIZE:
         # 4 minutes
         print('Tokenizing...')

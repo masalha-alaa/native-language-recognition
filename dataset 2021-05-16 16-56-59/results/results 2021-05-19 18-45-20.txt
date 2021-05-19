@@ -1,0 +1,7 @@
+BINARY_NATIVITY
+ONE_K_WORDS
+TFIDF
+LogisticRegression (0:00:00.281216)
+[0.95, 0.96, 0.98, 0.96, 0.98, 0.97, 0.99, 0.98, 0.94, 0.97]
+avg: 96.8%
+

@@ -31,25 +31,31 @@ def sentences_count(input_dir, output_dir, show=True, save=False):
     y,x = zip(*sorted(zip(y,x), reverse=True))
     new_figure('Sentences per Country', 'Country', 'Number of Sentences', x, y)
 
-    if save:
-        plt.savefig(f'{output_dir}/sentences_count.png', bbox_inches='tight', dpi=200)
-    if show:
-        plt.show()
+    if save or show:
+        if save:
+            plt.savefig(f'{output_dir}/sentences_count.png', bbox_inches='tight', dpi=200)
+        if show:
+            plt.show()
+        plt.close()
 
 
-def median_sentence_len(input_dir, output_dir, show=True, save=False):
+def median_sentence_len(input_dir, output_dir, method='average', show=True, save=False):
+    def apply_method(lst): return np.mean(lst) if method == 'average' else np.median(lst)
+
     x,y = [],[]
     for country_file in os.listdir(input_dir):
         if country_file.endswith('.txt'):
             x.append(re.sub(r'\..*', '', country_file))
-            y.append(np.median([len(line.split()) for line in open(input_dir / country_file, encoding='utf-8')]))
+            y.append(apply_method([len(line.split()) for line in open(input_dir / country_file, encoding='utf-8')]))
     y,x = zip(*sorted(zip(y,x), reverse=True))
     new_figure('Sentences median length per Country', 'Country', 'Median Sentence length (words)', x, y)
 
-    if save:
-        plt.savefig(f'{output_dir}/sentences_length.png', bbox_inches='tight', dpi=200)
-    if show:
-        plt.show()
+    if save or show:
+        if save:
+            plt.savefig(f'{output_dir}/sentences_length_{method}.png', bbox_inches='tight', dpi=200)
+        if show:
+            plt.show()
+        plt.close()
 
 
 def chunks_count(input_dir, output_dir, show=True, save=False):
@@ -61,10 +67,12 @@ def chunks_count(input_dir, output_dir, show=True, save=False):
     y,x = zip(*sorted(zip(y,x), reverse=True))
     new_figure('Chunks per Country', 'Country', 'Number of Chunks', x, y)
 
-    if save:
-        plt.savefig(f'{output_dir}/chunks_count.png', bbox_inches='tight', dpi=200)
-    if show:
-        plt.show()
+    if save or show:
+        if save:
+            plt.savefig(f'{output_dir}/chunks_count.png', bbox_inches='tight', dpi=200)
+        if show:
+            plt.show()
+        plt.close()
 
 
 if __name__ == '__main__':
@@ -80,7 +88,10 @@ if __name__ == '__main__':
     sentences_count(input_dir, output_dir, show=SHOW_IMAGES, save=SAVE_IMAGES)
 
     print('Sentences median length...')
-    median_sentence_len(input_dir, output_dir, show=SHOW_IMAGES, save=SAVE_IMAGES)
+    median_sentence_len(input_dir, output_dir, method='median', show=SHOW_IMAGES, save=SAVE_IMAGES)
+
+    print('Sentences average length...')
+    median_sentence_len(input_dir, output_dir, method='average', show=SHOW_IMAGES, save=SAVE_IMAGES)
 
     print('Chunks count...')
     chunks_count(chunks_input_dir, output_dir, show=SHOW_IMAGES, save=SAVE_IMAGES)
