@@ -1,0 +1,8 @@
+ClassesType.BINARY_NATIVITY
+FeatureVectorType: ONE_K_POS_TRI & FUNCTION_WORDS
+FeatureVectorValues: FREQUENCY
+500 chunks per class
+LogisticRegression (0:00:00.617338)
+[0.94, 0.94, 0.92, 0.91, 0.89, 0.94, 0.93, 0.94, 0.94, 0.94]
+avg: 92.9%
+

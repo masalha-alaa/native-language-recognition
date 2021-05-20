@@ -1,0 +1,8 @@
+ClassesType.BINARY_NATIVITY
+FeatureVectorType: FUNCTION_WORDS
+FeatureVectorValues: BINARY
+500 chunks per class
+LogisticRegression (0:00:01.280579)
+[0.85, 0.77, 0.86, 0.83, 0.76, 0.79, 0.76, 0.88, 0.74, 0.71]
+avg: 79.5%
+

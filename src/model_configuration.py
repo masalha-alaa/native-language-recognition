@@ -9,16 +9,100 @@ from pickle import load
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 
-class FeatureVectorType(Enum):
-    ONE_K_WORDS = 1
-    ONE_K_POS_TRI = 2
-    FUNCTION_WORDS = 3
+class FtrVectorEnum(Enum):
+    ONE_K_WORDS = 1 << 0
+    ONE_K_POS_TRI = 1 << 1
+    FUNCTION_WORDS = 1 << 2
+
+
+class FeatureVectorType(object):
+    __secret_key = object()
+
+    def __init__(self, choice=None, name=None, value=None, secret_key=None):
+        if isinstance(choice, FtrVectorEnum):
+            self.name = choice.name
+            self.value = choice.value
+        elif name and value and secret_key == self.__secret_key:
+            self.name = name
+            self.value = value
+        else:
+            raise ValueError
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, the_name):
+        self._name = the_name
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, the_value):
+        self._value = the_value
+
+    def __or__(self, other):
+        return FeatureVectorType(choice=None,
+                                 name=f'{self.name} & {other.name}',
+                                 value=self.value | other.value,
+                                 secret_key=self.__secret_key)
+
+    def __and__(self, other):
+        return self.value & other.value
 
 
 class FeatureVectorValues(Enum):
     BINARY = 1
     FREQUENCY = 2
     TFIDF = 3
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
+
+
+class SetupClass:
+    def __init__(self, feature_vector_values_type: FeatureVectorValues, vocabulary, chunks_dir, ngrams):
+        self._feature_vector_values_type = feature_vector_values_type
+        self._vocabulary = vocabulary
+        self.chunks_dir = chunks_dir
+        self._ngrams = ngrams
+        self._vectorizer = None
+        self.data = None
+
+    def load_vectorizer(self):
+        if self._feature_vector_values_type == FeatureVectorValues.BINARY:
+            self._vectorizer = CountVectorizer(vocabulary=self._vocabulary, ngram_range=self._ngrams, binary=True)
+        elif self._feature_vector_values_type == FeatureVectorValues.FREQUENCY:
+            self._vectorizer = TfidfVectorizer(vocabulary=self._vocabulary, ngram_range=self._ngrams, use_idf=False)
+        elif self._feature_vector_values_type == FeatureVectorValues.TFIDF:
+            self._vectorizer = TfidfVectorizer(vocabulary=self._vocabulary, ngram_range=self._ngrams, use_idf=True)
+
+    def fit_transform(self):
+        if self._vectorizer is None:
+            raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
+        return self._vectorizer.fit_transform(self.data[self.data.columns[0]])  # TODO: Write this in a better way
+
+    @property
+    def chunks_dir(self):
+        return self._chunks_dir
+
+    @chunks_dir.setter
+    def chunks_dir(self, path):
+        self._chunks_dir = path
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, the_data):
+        self._data = the_data
 
 
 class ModelConfiguration:
@@ -37,31 +121,27 @@ class ModelConfiguration:
 
     @staticmethod
     def get_configuration(feature_vector_type: FeatureVectorType, feature_vector_vals: FeatureVectorValues):
-        if feature_vector_type == FeatureVectorType.ONE_K_WORDS:
-            feature_vector_path = FeatureVectorPaths.ONE_THOUSAND_WORDS
-            chunks_dir = TOKEN_CHUNKS_DIR
-            ngrams = (1, 1)
-        elif feature_vector_type == FeatureVectorType.ONE_K_POS_TRI:
-            feature_vector_path = FeatureVectorPaths.ONE_THOUSAND_POS_TRI
-            chunks_dir = POS_CHUNKS_DIR
-            ngrams = (3, 3)
-        elif feature_vector_type == FeatureVectorType.FUNCTION_WORDS:
-            feature_vector_path = FeatureVectorPaths.FUNCTION_WORDS
-            chunks_dir = TOKEN_CHUNKS_DIR
-            ngrams = (1, 1)
-        else:
-            raise ValueError
+        vocabularies = []
 
-        with open(FEATURES_DIR / feature_vector_path, mode='rb') as f:
-            vocabulary = ModelConfiguration._refine_vocabulary(load(f))
+        if feature_vector_type & FtrVectorEnum.ONE_K_WORDS:
+            with open(FEATURES_DIR / FeatureVectorPaths.ONE_THOUSAND_WORDS, mode='rb') as f:
+                vocabularies.append(SetupClass(feature_vector_vals,  # values type
+                                               ModelConfiguration._refine_vocabulary(load(f)),  # vocabulary
+                                               TOKEN_CHUNKS_DIR,  # chunks dir
+                                               (1, 1)))  # ngrams
 
-        if feature_vector_vals == FeatureVectorValues.BINARY:
-            vectorizer = CountVectorizer(vocabulary=vocabulary, ngram_range=ngrams, binary=True)
-        elif feature_vector_vals == FeatureVectorValues.FREQUENCY:
-            vectorizer = TfidfVectorizer(vocabulary=vocabulary, ngram_range=ngrams, use_idf=False)
-        elif feature_vector_vals == FeatureVectorValues.TFIDF:
-            vectorizer = TfidfVectorizer(vocabulary=vocabulary, ngram_range=ngrams, use_idf=True)
-        else:
-            raise ValueError
+        if feature_vector_type & FtrVectorEnum.ONE_K_POS_TRI:
+            with open(FEATURES_DIR / FeatureVectorPaths.ONE_THOUSAND_POS_TRI, mode='rb') as f:
+                vocabularies.append(SetupClass(feature_vector_vals,  # values type
+                                               ModelConfiguration._refine_vocabulary(load(f)),  # vocabulary
+                                               POS_CHUNKS_DIR,  # chunks dir
+                                               (3, 3)))  # ngrams
 
-        return vectorizer, chunks_dir
+        if feature_vector_type & FtrVectorEnum.FUNCTION_WORDS:
+            with open(FEATURES_DIR / FeatureVectorPaths.FUNCTION_WORDS, mode='rb') as f:
+                vocabularies.append(SetupClass(feature_vector_vals,  # values type
+                                               ModelConfiguration._refine_vocabulary(load(f)),  # vocabulary
+                                               TOKEN_CHUNKS_DIR,  # chunks dirr
+                                               (1, 1)))  # ngrams
+
+        return vocabularies

@@ -1,6 +1,6 @@
 import argparse
 from bisect import bisect_left
-from src.model_configuration import *
+from scipy.sparse import hstack, csr_matrix
 from src.data_picker import *
 import pandas as pd
 import numpy as np
@@ -112,7 +112,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
                     if plots_path:
                         # fig.set_size_inches((4, 3), forward=False)
                         fig.set_size_inches((0.22 * len(classes) + 3.8, 0.16 * len(classes) + 2.8), forward=False)
-                        plt.savefig(plots_path / f'cm {datetime.now().strftime(DATE_STR_SHORT)}.png',
+                        plt.savefig(plots_path / f'{datetime.now().strftime(DATE_STR_SHORT)} cm.png',
                                     bbox_inches='tight', dpi=170)
                     plt.show()
                     plt.close()
@@ -174,61 +174,82 @@ if __name__ == '__main__':
     args = vars(ap.parse_args())
     verbose = args['verbose']
 
-    results_path = RESULTS_DIR
-
     print('Program started')
-    ts = datetime.now()
-    print(ts)
-    results_path.mkdir(exist_ok=True)
-    plots_path = results_path
-    results_path /= f'results {ts.strftime(DATE_STR_SHORT)}.txt'
 
-    # =======> Choose data type <=======
-    # data_type = ClassesType.BINARY_NATIVITY
-    data_type = ClassesType.COUNTRY_IDENTIFICATION
-    # data_type = ClassesType.LANGUAGE_FAMILY
+    # Enable / Disable any combination...
+    data_types = [
+        # ClassesType.BINARY_NATIVITY,
+        ClassesType.COUNTRY_IDENTIFICATION,
+        ClassesType.LANGUAGE_FAMILY
+    ]
 
-    # =======> Choose feature vector type <=======
-    # feature_vector_type = FeatureVectorType.ONE_K_WORDS
-    # feature_vector_type = FeatureVectorType.ONE_K_POS_TRI
-    feature_vector_type = FeatureVectorType.FUNCTION_WORDS
+    feature_vector_types = [
+        FeatureVectorType(FtrVectorEnum.ONE_K_WORDS),
+        FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI),
+        FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS),
+        FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI) | FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS)
+        # can combine features using the bitwise or (|) operator
+    ]
 
-    # =======> Choose feature vector values <=======
-    # feature_vector_values = FeatureVectorValues.BINARY
-    # feature_vector_values = FeatureVectorValues.FREQUENCY
-    feature_vector_values = FeatureVectorValues.TFIDF
+    feature_vector_value_types = [
+        FeatureVectorValues.BINARY,
+        FeatureVectorValues.FREQUENCY,
+        FeatureVectorValues.TFIDF
+    ]
 
-    if data_type == ClassesType.BINARY_NATIVITY:
-        chunks_per_class = 500
-    elif data_type == ClassesType.COUNTRY_IDENTIFICATION:
-        chunks_per_class = 50
-    elif data_type == ClassesType.LANGUAGE_FAMILY:
-        chunks_per_class = 75
-    else:
-        raise NotImplementedError
+    for data_type in data_types:
+        for feature_vector_type in feature_vector_types:
+            for feature_vector_values in feature_vector_value_types:
 
-    config = f'{data_type}\n{feature_vector_type}\n{feature_vector_values}\n{chunks_per_class} chunks per class'
-    print(config)
-    if verbose > 0 and results_path:
-        with open(results_path, mode='a', encoding='utf8') as f:
-            f.write(f'{config}\n')
+                if data_type != ClassesType.BINARY_NATIVITY and feature_vector_values == FeatureVectorValues.BINARY:
+                    # This is a bad choice, because the clf will complain about unscaled data.
+                    continue
 
-    print('Collecting data...', end=' ')
-    ts = datetime.now()
-    vectorizer, chunks_dir = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
-    df = DataPicker.get_data(data_type, chunks_dir, chunks_per_class)
-    print(f'({datetime.now() - ts})')
+                ts = datetime.now()
+                print(ts)
+                results_path = RESULTS_DIR
+                results_path.mkdir(exist_ok=True)
+                plots_path = results_path
+                results_path /= f'{ts.strftime(DATE_STR_SHORT)} results.txt'
 
-    print('Constructing features...', end=' ')
-    ts = datetime.now()
-    ftr_table = vectorizer.fit_transform(df['chunks'])
-    print(f'({datetime.now() - ts})')
+                if data_type == ClassesType.BINARY_NATIVITY:
+                    chunks_per_class = 500
+                elif data_type == ClassesType.COUNTRY_IDENTIFICATION:
+                    chunks_per_class = 50
+                elif data_type == ClassesType.LANGUAGE_FAMILY:
+                    chunks_per_class = 75
+                else:
+                    raise NotImplementedError
 
-    print('Classifying...')
-    scores_dict = run_classifiers(X=ftr_table, y=df['label'].values, verbose=verbose,
-                                  results_path=results_path,
-                                  plots_path=plots_path,
-                                  classes=sort_a_by_b(pd.unique(df['label']), COUNTRIES_ORDER),
-                                  cm_title=config)
+                config = f'{data_type}\n{feature_vector_type}\n{feature_vector_values}\n{chunks_per_class} chunks per class'
+                print(config)
+                if verbose > 0 and results_path:
+                    with open(results_path, mode='a', encoding='utf8') as f:
+                        f.write(f'{config}\n')
 
-    print(f'\nTOTAL TIME: {datetime.now() - ts}')
+                print('Collecting data...', end=' ')
+                ts = datetime.now()
+                data_setups, labels = DataPicker.get_data(feature_vector_type, feature_vector_values, data_type, chunks_per_class)
+                print(f'({datetime.now() - ts})')
+
+                print('Constructing features...', end=' ')
+                ts = datetime.now()
+                ftr_table = csr_matrix([])
+                for data_setup in data_setups:
+                    data_setup.load_vectorizer()
+                    if ftr_table.shape[1]:
+                        ftr_table = hstack([ftr_table, data_setup.fit_transform()])
+                    else:
+                        # first loop iteration
+                        ftr_table = data_setup.fit_transform()
+                ftr_table = ftr_table.tocsr()
+                print(f'({datetime.now() - ts})')
+
+                print('Classifying...')
+                scores_dict = run_classifiers(X=ftr_table, y=labels.values, verbose=verbose,
+                                              results_path=results_path,
+                                              plots_path=plots_path,
+                                              classes=sort_a_by_b(pd.unique(labels), COUNTRIES_ORDER),
+                                              cm_title=config)
+
+                print(f'\nTOTAL TIME: {datetime.now() - ts}')

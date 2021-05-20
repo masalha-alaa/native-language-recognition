@@ -4,12 +4,16 @@ import random
 from pickle import load
 from enum import Enum
 import pandas as pd
+from src.model_configuration import *
 
 
 class ClassesType(Enum):
     BINARY_NATIVITY = 1
     COUNTRY_IDENTIFICATION = 2  # NLI
     LANGUAGE_FAMILY = 3
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
 
 
 class DataPicker:
@@ -68,19 +72,29 @@ class DataPicker:
         return d
 
     @staticmethod
-    def get_data(classes_type: ClassesType, chunks_dir, chunks_per_class):
-        if classes_type == ClassesType.BINARY_NATIVITY:
-            native_chunks, non_native_chunks = DataPicker._get_native_non_native_classes(chunks_dir, max_chunks_per_class=chunks_per_class)
-            df = pd.DataFrame(data=native_chunks + non_native_chunks, columns=['chunks'])
-            df['label'] = [DataPicker.NATIVE] * len(native_chunks) + [DataPicker.NON_NATIVE] * len(non_native_chunks)
-        elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
-            countries = DataPicker._get_country_classes(chunks_dir, chunks_per_class)
-            df = pd.DataFrame(data=sum(countries.values(), []), columns=['chunks'])
-            df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
-        elif classes_type == ClassesType.LANGUAGE_FAMILY:
-            raise NotImplementedError
-        else:
-            raise ValueError
+    def get_data(feature_vector_type: FeatureVectorType, feature_vector_values: FeatureVectorValues,
+                 classes_type: ClassesType, chunks_per_class):
 
-        df = df.sample(frac=1, random_state=42).reset_index(drop=True)
-        return df
+        vocabulary_setups = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
+
+        for vocabulary_setup in vocabulary_setups:
+            if classes_type == ClassesType.BINARY_NATIVITY:
+                native_chunks, non_native_chunks = DataPicker._get_native_non_native_classes(vocabulary_setup.chunks_dir,
+                                                                                             max_chunks_per_class=chunks_per_class)
+                df = pd.DataFrame(native_chunks + non_native_chunks, columns=['chunks'])
+                df['label'] = [DataPicker.NATIVE] * len(native_chunks) + [DataPicker.NON_NATIVE] * len(non_native_chunks)
+                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+            elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
+                countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir, chunks_per_class)
+                df = pd.DataFrame(sum(countries.values(), []), columns=['chunks'])
+                df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
+                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+            elif classes_type == ClassesType.LANGUAGE_FAMILY:
+                raise NotImplementedError
+
+        # The labels are the same for all setups in a particular function call,
+        # because 'classes_type' is constant in all iteration.
+        # So take any labels column... it doesn't matter.
+        return vocabulary_setups, vocabulary_setups[0].data['label']
