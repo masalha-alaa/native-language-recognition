@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K POS TRI
+FeatureVectorValues: BINARY
+50 chunks per class
+LogisticRegression (0:01:20.024024)
+[0.18421052631578946, 0.2, 0.2, 0.17894736842105263, 0.19473684210526315, 0.20526315789473684, 0.24736842105263157, 0.2, 0.2631578947368421, 0.14736842105263157]
+avg: 20.21%
+
+LogisticRegression best 50 features (most to least important):
+rb rb vbg, rb vb rb, cc rb vbd, vbz dt rb, vbd prp vbd, jj nnp vbz, in dt vbz, nnp nn rb, vbz dt nnp, cc prp vbd, vbd nn in, wrb prp vbd, vbp vbn to, rbs jj nn, nns prp vbd, vbd dt nnp, nns wdt vbp, nnp rb in, nn vbz vbg, nn to dt, jj nn wrb, dt nnp vbz, to dt nn, vbp prp vbd, in dt cd, in vbg jj, vbp jj nn, nn vbd dt, jj nns rb, prp vbd nnp, prp to vb, cc vb prp, nnp dt jj, vbz in nnp, nn nn vbd, vb in in, jj in vbg, prp rb rb, nnp nn prp, rb prp rb, nnp vbd dt, dt nns vbp, prp vb in, in wp prp, prp vbd prp, dt jj cd, nnp nnp prp, cc nnp nnp, rb jjr in, rb jj jj
+

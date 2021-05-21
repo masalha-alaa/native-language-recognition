@@ -6,9 +6,8 @@ from paths import *
 from collections import Counter
 from datetime import datetime
 from pickle import dump
-from nltk import ngrams,FreqDist
+from nltk import ngrams, FreqDist
 import plotly.express as px
-from shutil import copyfile
 
 
 def k_most_common(input_dir, k=1000):
@@ -108,7 +107,7 @@ if __name__ == '__main__':
         trigrams_ts = datetime.now()
         print('K most common POS ngrams (trigrams)...')
         output_dir.mkdir(exist_ok=True)
-        most_common = k_most_common_trigrams(pos_input_dir)
+        most_common = k_most_common_trigrams(pos_input_dir)  # TODO: Try with k = 300
         with open(output_dir / f'{len(most_common)} most common POS trigrams{PKL_LST_EXT}', mode='wb') as f:
             dump(most_common, f, -1)
         print(datetime.now() - trigrams_ts)

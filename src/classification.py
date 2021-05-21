@@ -3,6 +3,7 @@ Classification
 """
 
 import argparse
+from my_random import SEED
 from bisect import bisect_left
 from src.data_picker import *
 import pandas as pd
@@ -100,7 +101,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
         classes = pd.unique(y)
 
     classifiers = [(SVC(), False),
-                   (LogisticRegression(max_iter=500, random_state=42), True),
+                   (LogisticRegression(max_iter=1000, random_state=SEED), True),
                    (MultinomialNB(), False),
                    (RandomForestClassifier(), False),
                    (KNeighborsClassifier(), False)]
@@ -175,7 +176,7 @@ def classify(clf, K, X, y):
         all_predicted.extend(predicted)
         all_actual.extend(actual)
 
-    # now fit on all data (for extracting best features later) (also if want to save model...)
+    # now fit on all data (for reliably extracting best features later) (also if want to save model...)
     clf.fit(X, y)
 
     return scores, all_actual, all_predicted
@@ -197,7 +198,7 @@ def sort_a_by_b(a, b):
 
 
 if __name__ == '__main__':
-    SELECT_K_BEST = 30
+    SELECT_K_BEST = 50
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--verbose", default=3, type=int, help="Verbose level [0-3]")
@@ -230,11 +231,6 @@ if __name__ == '__main__':
     for data_type in data_types:
         for feature_vector_type in feature_vector_types:
             for feature_vector_values in feature_vector_value_types:
-
-                if data_type != ClassesType.BINARY_NATIVITY and feature_vector_values == FeatureVectorValues.BINARY:
-                    # This is a bad choice, because the clf will complain about unscaled data.
-                    print(f'* SKIPPED SETUP: {data_type}, {feature_vector_values}')
-                    continue
 
                 ts = datetime.now()
                 print(ts)
@@ -286,7 +282,8 @@ if __name__ == '__main__':
                     best_features = select_k_best(coefs_dict, features_df.columns, SELECT_K_BEST)
                     print_k_best = ''
                     for clf_name, best_k_ftrs in best_features.items():
-                        print_k_best += f'{clf_name}:\n{best_k_ftrs}\n'
-                    print_log(print_k_best)
+                        print_k_best += f"{clf_name} best {SELECT_K_BEST} features (most to least important):\n" \
+                                        f"{', '.join(best_k_ftrs.tolist())}\n"
+                    print_log(print_k_best, file=results_path)
 
-                print(f'\nTOTAL TIME: {datetime.now() - ts}')
+                print(f'TOTAL TIME: {datetime.now() - ts}\n')

@@ -1,8 +1,0 @@
-ClassesType.BINARY_NATIVITY
-FeatureVectorType: ONE_K_WORDS
-FeatureVectorValues: BINARY
-500 chunks per class
-LogisticRegression (0:00:01.563822)
-[0.97, 0.96, 0.99, 0.98, 0.96, 0.96, 0.97, 0.95, 0.93, 0.95]
-avg: 96.2%
-

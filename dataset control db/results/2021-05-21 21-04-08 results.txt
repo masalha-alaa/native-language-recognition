@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K POS TRI & FUNCTION WORDS
+FeatureVectorValues: FREQUENCY
+50 chunks per class
+LogisticRegression (0:01:13.521112)
+[0.6866666666666666, 0.58, 0.6066666666666667, 0.6733333333333333, 0.6266666666666667, 0.6, 0.6733333333333333, 0.64, 0.64, 0.6066666666666667]
+avg: 63.33%
+
+LogisticRegression best 50 features (most to least important):
+cc nnp nnp, nnp nnp cc, to nnp in, nnp cc nnp, an, to dt nnp, to vb to, us, to, nn to nnp, in nnp nnp, nnp nnp dt, my, dt nnp nnp, nnp in dt, twelve, to nnp cc, get, in nnp cc, in, cc dt nnp, dt nnp cc, nnp nnp in, around, and, in cd nns, in nnp in, nn nns in, vbp in nnp, nnp rb rb, nnp nnp nnp, nnp in prp, done, in rb rb, rb in nnp, from, over, prp vbp vbn, cc prp vbd, getting, nnp cc dt, nearly, on, back, off, nnp prp vbp, rb jj to, mine, in nnp prp, too
+

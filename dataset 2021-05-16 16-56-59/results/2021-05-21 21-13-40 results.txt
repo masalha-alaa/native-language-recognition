@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: TFIDF
+500 chunks per class
+LogisticRegression (0:00:01.209890)
+[1.0, 1.0, 0.99, 0.99, 1.0, 0.98, 1.0, 1.0, 1.0, 0.99]
+avg: 99.5%
+
+LogisticRegression best 50 features (most to least important):
+swedish, danish, sweden, even, mostly, we, also, same, and, en, is, german, tho, russian, guess, cases, times, belgium, summer, hungarian, are, some, finland, indeed, croatia, case, hungary, turkish, czech, not, regions, translation, de, netherlands, mother, romanian, denmark, share, biggest, except, green, idk, iceland, norway, water, almost, dialect, well, rich, germans
+

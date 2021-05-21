@@ -11,6 +11,7 @@ import nltk
 from pickle import dump
 from multiprocessing import Pool
 import random
+from my_random import SEED
 
 
 def clean_a_line(line):
@@ -78,7 +79,7 @@ def chunkify_data(input_dir, output_dir, minimum_tokens_in_sentence=3, chunk_siz
             with open(input_dir / filename, mode='r', encoding='utf-8') as fr:
                 with open(output_dir / filename.replace('.txt', PKL_LST_EXT), mode='wb') as fw:
                     lines = fr.readlines()
-                    random.Random(42).shuffle(lines)
+                    random.Random(SEED).shuffle(lines)
                     for tokens_line in lines:
                         tokens_line_split = tokens_line.split()
                         if len(tokens_line_split) >= minimum_tokens_in_sentence:

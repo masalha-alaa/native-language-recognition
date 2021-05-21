@@ -3,7 +3,8 @@ Picking data from files.
 """
 
 
-import random
+import my_random
+from my_random import SEED
 import pandas as pd
 from collections import defaultdict
 from src.model_configuration import *
@@ -19,7 +20,6 @@ class ClassesType(Enum):
 
 
 class DataPicker:
-    random.seed(42)
     NATIVE = 'Native'
     NON_NATIVE = 'Non-Native'
 
@@ -30,11 +30,11 @@ class DataPicker:
             chunks = load(f)
             if len(chunks) < min_chunks:
                 return []
-            chunks = random.sample(chunks,
+            chunks = my_random.sample(chunks,
                                    len(chunks) if max_chunks == -1
                                    else max_chunks if max_chunks <= len(chunks)
                                    else len(chunks))
-        return [random.sample(chunk, len(chunk)) for chunk in chunks]
+        return [my_random.sample(chunk, len(chunk)) for chunk in chunks]
 
     @staticmethod
     def _get_native_non_native_classes(input_path, max_chunks_per_non_native_country=50, max_chunks_per_class=500):
@@ -57,9 +57,9 @@ class DataPicker:
 
         chunks_per_class = min(max_chunks_per_class, len(native_chunks), len(non_native_chunks))
         if len(native_chunks) > chunks_per_class:
-            native_chunks = random.sample(native_chunks, chunks_per_class)
+            native_chunks = my_random.sample(native_chunks, chunks_per_class)
         if len(non_native_chunks) > chunks_per_class:
-            non_native_chunks = random.sample(non_native_chunks, chunks_per_class)
+            non_native_chunks = my_random.sample(non_native_chunks, chunks_per_class)
 
         return native_chunks, non_native_chunks
 
@@ -104,19 +104,19 @@ class DataPicker:
                                                                                              max_chunks_per_class=chunks_per_class)
                 df = pd.DataFrame(native_chunks + non_native_chunks, columns=['chunks'])
                 df['label'] = [DataPicker.NATIVE] * len(native_chunks) + [DataPicker.NON_NATIVE] * len(non_native_chunks)
-                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
+                vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
             elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
                 countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir, chunks_per_country=chunks_per_class)
                 df = pd.DataFrame(sum(countries.values(), []), columns=['chunks'])
                 df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
-                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
+                vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
             elif classes_type == ClassesType.LANGUAGE_FAMILY:
                 families = DataPicker._get_family_classes(vocabulary_setup.chunks_dir, chunks_per_fam=chunks_per_class)
                 df = pd.DataFrame(sum(families.values(), []), columns=['chunks'])
                 df['label'] = [family for family, chunks in families.items() for _ in range(len(chunks))]
-                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
+                vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
         # The labels are the same for all setups in a particular function call,
         # because 'classes_type' is constant in all iteration.

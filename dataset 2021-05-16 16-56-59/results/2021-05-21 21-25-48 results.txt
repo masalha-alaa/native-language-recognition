@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K POS TRI & FUNCTION WORDS
+FeatureVectorValues: BINARY
+50 chunks per class
+LogisticRegression (0:01:52.310413)
+[0.34210526315789475, 0.3684210526315789, 0.3684210526315789, 0.3526315789473684, 0.38421052631578945, 0.3736842105263158, 0.3631578947368421, 0.3894736842105263, 0.3473684210526316, 0.3157894736842105]
+avg: 36.05%
+
+LogisticRegression best 50 features (most to least important):
+ninth, unless, rare, despite, thither, rb rb vbg, twenty, oft, twelve, bid, vbz dt rb, vbd prp vbd, nnp nn rb, down, around, above, cc rb vbd, whereas, vbz dt nnp, jj nnp vbz, result, jj nn wrb, rb vb rb, in dt vbz, dt nnp vbz, wrb prp vbd, although, beneath, cc prp vbd, in wp prp, vbd nn in, vbd dt nnp, nn to dt, vbp jj nn, myself, nns wdt vbp, shall, off, in vbg jj, nn nn vbd, nnp rb in, vb in in, certainly, having, prp vbd nnp, rbs jj nn, jj nns rb, ago, dt nns vbp, to dt nn
+

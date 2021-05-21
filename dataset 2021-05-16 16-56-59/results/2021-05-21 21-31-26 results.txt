@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: BINARY
+300 chunks per class
+LogisticRegression (0:00:24.950467)
+[0.9583333333333334, 0.9416666666666667, 0.9916666666666667, 0.925, 0.95, 0.95, 0.9583333333333334, 0.925, 0.9666666666666667, 0.9666666666666667]
+avg: 95.33%
+
+LogisticRegression best 50 features (most to least important):
+irish, british, ireland, scotland, britain, finnish, scottish, england, wales, didn, london, america, americans, island, brexit, uk, over, reading, although, united, government, chinese, surprised, dutch, sort, hour, through, term, up, into, native, don, northern, anywhere, around, thought, west, out, head, majority, soon, street, bunch, fucking, europeans, speaking, france, leave, speakers, wear
+

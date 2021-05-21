@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K POS TRI
+FeatureVectorValues: TFIDF
+50 chunks per class
+LogisticRegression (0:01:02.110183)
+[0.5, 0.4533333333333333, 0.36666666666666664, 0.4, 0.44666666666666666, 0.44, 0.42, 0.4266666666666667, 0.4533333333333333, 0.38]
+avg: 42.87%
+
+LogisticRegression best 50 features (most to least important):
+cc nnp nnp, nnp nnp cc, to nnp in, nnp cc nnp, to vb to, nn to nnp, to dt nnp, nnp nnp dt, in nnp nnp, nnp in dt, to nnp cc, nn nns in, dt nnp nnp, nnp nnp in, in nnp in, in nnp cc, nnp in prp, nnp rb rb, dt nnp cc, vbp in nnp, prp vbp vbn, cc dt nnp, in cd nns, vbp vbn in, in rb rb, rb jj to, rb in nnp, nnp cc dt, in nnp jj, nnp nnp nnp, in nnp to, vbg dt nns, in vbg in, prp vbp in, cc prp vbd, md vb to, nnp nnp nns, nnp in nnp, in prp vbd, nnp prp vbp, vbg in nnp, vbg in nn, rb vbg to, cc nnp in, vbg to vb, nnp rb prp, to dt jj, in nnp prp, md vb in, dt nn nn
+

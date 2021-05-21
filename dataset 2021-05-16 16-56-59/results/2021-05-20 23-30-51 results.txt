@@ -1,4 +1,0 @@
-ClassesType.LANGUAGE_FAMILY
-FeatureVectorType: ONE_K_WORDS
-FeatureVectorValues: FREQUENCY
-75 chunks per class

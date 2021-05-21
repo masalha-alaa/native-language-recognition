@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: FUNCTION WORDS
+FeatureVectorValues: TFIDF
+500 chunks per class
+LogisticRegression (0:00:01.744635)
+[0.89, 0.9, 0.92, 0.88, 0.91, 0.87, 0.92, 0.91, 0.86, 0.85]
+avg: 89.1%
+
+LogisticRegression best 50 features (most to least important):
+not, is, same, also, oh, yes, instead, them, should, they, everybody, already, some, something, still, by, because, it, at, fewer, everything, with, even, welcome, against, after, wil, during, among, since, lastly, towards, nor, only, nobody, sometimes, between, example, that, actual, while, and, better, billion, why, in, actually, no, later, according
+

@@ -1,8 +1,0 @@
-ClassesType.BINARY_NATIVITY
-FeatureVectorType: ONE_K_POS_TRI
-FeatureVectorValues: BINARY
-500 chunks per class
-LogisticRegression (0:00:02.916205)
-[0.76, 0.81, 0.78, 0.84, 0.9, 0.77, 0.83, 0.78, 0.81, 0.82]
-avg: 81.0%
-

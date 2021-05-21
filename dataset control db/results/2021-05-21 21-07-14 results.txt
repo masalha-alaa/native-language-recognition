@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: TFIDF
+300 chunks per class
+LogisticRegression (0:00:07.391865)
+[0.9833333333333333, 0.9833333333333333, 0.9833333333333333, 1.0, 0.9833333333333333, 0.9916666666666667, 1.0, 0.9916666666666667, 1.0, 1.0]
+avg: 99.17%
+
+LogisticRegression best 50 features (most to least important):
+ireland, irish, america, american, uk, british, us, trip, scottish, scotland, going, australia, canada, trump, wales, england, americans, off, states, brexit, to, northern, out, an, my, britain, voted, places, independent, new, up, london, china, across, united, looking, definitely, little, travel, remain, may, great, largest, vote, see, place, down, leave, who, europeans
+

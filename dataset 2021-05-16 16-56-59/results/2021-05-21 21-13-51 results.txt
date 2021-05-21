@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K POS TRI
+FeatureVectorValues: TFIDF
+500 chunks per class
+LogisticRegression (0:00:02.091543)
+[0.92, 0.91, 0.9, 0.94, 0.92, 0.93, 0.91, 0.94, 0.93, 0.95]
+avg: 92.5%
+
+LogisticRegression best 50 features (most to least important):
+vbp rb vb, nn jj nnp, nn nn nn, jj nns jj, vbz rb in, in cd nn, in nnp nn, nn nn nnp, vbz in jj, dt vbz wrb, nn jj nn, nnp in cd, rb prp vbd, in jj prp, vbp in nn, dt nns cc, jj in in, jj nn nnp, cc jj nn, nn vbz rb, jj nnp nnp, cc rb in, nnp nn nn, nn nnp nn, nn nn vbd, vb jj nn, nn in nnp, rb jj rb, cc in jj, nn vbz jj, nnp cc jj, rb vb in, nnp nn nnp, prp vbz rb, jj prp md, rb vb dt, nns in nn, nns rb rb, cc dt vbz, jj nn in, vbg in nn, vbz jj cc, vbz in nn, to dt nn, nn rb prp, prp rb vbp, in nn cc, prp vbz vbn, rb vbd prp, rb in jj
+

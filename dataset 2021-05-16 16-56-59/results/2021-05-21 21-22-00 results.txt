@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: FUNCTION WORDS
+FeatureVectorValues: BINARY
+50 chunks per class
+LogisticRegression (0:01:30.280522)
+[0.17894736842105263, 0.23684210526315788, 0.23157894736842105, 0.24210526315789474, 0.23157894736842105, 0.18947368421052632, 0.21578947368421053, 0.2, 0.23157894736842105, 0.1736842105263158]
+avg: 21.32%
+
+LogisticRegression best 50 features (most to least important):
+unless, twenty, rare, around, despite, result, having, round, although, down, off, certainly, ninth, soon, ago, possibly, beneath, above, too, another, did, oft, certain, shall, through, under, beyond, everything, nobody, billion, twelve, myself, else, four, out, bid, over, until, whereas, other, still, nine, whoever, does, always, previously, moreover, well, mine, thither
+

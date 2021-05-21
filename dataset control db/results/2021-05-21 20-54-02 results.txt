@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: FREQUENCY
+50 chunks per class
+LogisticRegression (0:00:41.173539)
+[0.9866666666666667, 0.9933333333333333, 1.0, 0.9866666666666667, 0.9933333333333333, 0.9933333333333333, 0.9933333333333333, 1.0, 1.0, 0.9933333333333333]
+avg: 99.4%
+
+LogisticRegression best 50 features (most to least important):
+australia, canada, new, visa, trip, travel, south, usa, america, british, working, expensive, months, and, island, trade, year, uk, work, europe, an, china, world, in, immigration, coming, countries, to, english, days, love, us, americans, belgium, looking, place, home, lots, going, etc, accent, best, places, similar, through, western, born, my, getting, stay
+
