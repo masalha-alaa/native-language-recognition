@@ -1,0 +1,4 @@
+Fetched subreddits:
+
+AskEurope
+Europe
