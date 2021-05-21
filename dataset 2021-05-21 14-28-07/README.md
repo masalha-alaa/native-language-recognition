@@ -1,0 +1,5 @@
+Fetched subreddits:
+
+EuropeanCulture
+EuropeanFederalists
+Eurosceptics

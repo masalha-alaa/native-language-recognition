@@ -2,6 +2,7 @@
 /venv
 *.pkl
 *.pkl_dic
+*.pkl_lst
 /__pycache__
 clean
 features
