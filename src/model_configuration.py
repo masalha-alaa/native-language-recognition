@@ -29,7 +29,7 @@ class FeatureVectorType(object):
             raise ValueError
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
+        return f"{self.__class__.__name__}: {self.name.replace('_', ' ')}"
 
     @property
     def name(self):
@@ -63,7 +63,7 @@ class FeatureVectorValues(Enum):
     TFIDF = 3
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
+        return f"{self.__class__.__name__}: {self.name.replace('_', ' ')}"
 
 
 class SetupClass:

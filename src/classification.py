@@ -1,3 +1,7 @@
+"""
+Classification
+"""
+
 import argparse
 from bisect import bisect_left
 from scipy.sparse import hstack, csr_matrix
@@ -179,16 +183,16 @@ if __name__ == '__main__':
     # Enable / Disable any combination...
     data_types = [
         # ClassesType.BINARY_NATIVITY,
-        ClassesType.COUNTRY_IDENTIFICATION,
+        # ClassesType.COUNTRY_IDENTIFICATION,
         ClassesType.LANGUAGE_FAMILY
     ]
 
     feature_vector_types = [
-        FeatureVectorType(FtrVectorEnum.ONE_K_WORDS),
+        # FeatureVectorType(FtrVectorEnum.ONE_K_WORDS),
         FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI),
         FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS),
         FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI) | FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS)
-        # can combine features using the bitwise or (|) operator
+        # # can combine features using the bitwise or (|) operator
     ]
 
     feature_vector_value_types = [
@@ -203,6 +207,7 @@ if __name__ == '__main__':
 
                 if data_type != ClassesType.BINARY_NATIVITY and feature_vector_values == FeatureVectorValues.BINARY:
                     # This is a bad choice, because the clf will complain about unscaled data.
+                    print(f'* SKIPPED SETUP: {data_type}, {feature_vector_values}')
                     continue
 
                 ts = datetime.now()
@@ -217,7 +222,7 @@ if __name__ == '__main__':
                 elif data_type == ClassesType.COUNTRY_IDENTIFICATION:
                     chunks_per_class = 50
                 elif data_type == ClassesType.LANGUAGE_FAMILY:
-                    chunks_per_class = 75
+                    chunks_per_class = 300
                 else:
                     raise NotImplementedError
 
@@ -235,13 +240,14 @@ if __name__ == '__main__':
                 print('Constructing features...', end=' ')
                 ts = datetime.now()
                 ftr_table = csr_matrix([])
-                for data_setup in data_setups:
+                for i, data_setup in enumerate(data_setups):
                     data_setup.load_vectorizer()
-                    if ftr_table.shape[1]:
-                        ftr_table = hstack([ftr_table, data_setup.fit_transform()])
-                    else:
-                        # first loop iteration
+                    if i == 0:
+                        # first loop iteration, initiate ftr table
                         ftr_table = data_setup.fit_transform()
+                    else:
+                        # concatenate ftr tables
+                        ftr_table = hstack([ftr_table, data_setup.fit_transform()])
                 ftr_table = ftr_table.tocsr()
                 print(f'({datetime.now() - ts})')
 

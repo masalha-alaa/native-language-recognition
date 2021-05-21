@@ -1,9 +1,11 @@
-from common import *
-import os
+"""
+Picking data from files.
+"""
+
+
 import random
-from pickle import load
-from enum import Enum
 import pandas as pd
+from collections import defaultdict
 from src.model_configuration import *
 
 
@@ -13,7 +15,7 @@ class ClassesType(Enum):
     LANGUAGE_FAMILY = 3
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.name.replace('_', '')}"
+        return f"{self.__class__.__name__}: {self.name.replace('_', ' ')}"
 
 
 class DataPicker:
@@ -36,13 +38,15 @@ class DataPicker:
 
     @staticmethod
     def _get_native_non_native_classes(input_path, max_chunks_per_non_native_country=50, max_chunks_per_class=500):
+        min_chunks = min(20, max_chunks_per_non_native_country)
+
         native_chunks = []
         non_native_chunks = []
         for chunks_file in os.listdir(input_path):
             if chunks_file.endswith(PKL_LST_EXT):
                 is_native = chunks_file.replace(PKL_LST_EXT, '') in NATIVE_COUNTRIES
 
-                chunks = DataPicker._sample_random_chunks(input_path / chunks_file, 0,
+                chunks = DataPicker._sample_random_chunks(input_path / chunks_file, min_chunks,
                                                           -1 if is_native else max_chunks_per_non_native_country)
                 chunks = [''.join(chunk) for chunk in chunks]  # convert each chunk to one long string.
 
@@ -72,6 +76,23 @@ class DataPicker:
         return d
 
     @staticmethod
+    def _get_family_classes(input_path, max_chunks_per_country=80, chunks_per_fam=300):
+        min_chunks = min(20, max_chunks_per_country)
+
+        d = defaultdict(list)  # defaultdict to return an empty list (zero len) if we didn't add the family yet
+        for chunks_file in os.listdir(input_path):
+            if chunks_file.endswith(PKL_LST_EXT):
+                country_name = chunks_file.replace(PKL_LST_EXT, '')
+                family = LanguageFamilies.get_country_fam(country_name)
+                if family:
+                    add_to_fam = min(max_chunks_per_country, chunks_per_fam - len(d[family]))
+                    chunks = DataPicker._sample_random_chunks(input_path / chunks_file, min_chunks, add_to_fam)
+                    chunks = [''.join(chunk) for chunk in chunks]  # convert each chunk to one long string.
+                    if chunks:
+                        d[family].extend(chunks)
+        return d
+
+    @staticmethod
     def get_data(feature_vector_type: FeatureVectorType, feature_vector_values: FeatureVectorValues,
                  classes_type: ClassesType, chunks_per_class):
 
@@ -86,13 +107,16 @@ class DataPicker:
                 vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
             elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
-                countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir, chunks_per_class)
+                countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir, chunks_per_country=chunks_per_class)
                 df = pd.DataFrame(sum(countries.values(), []), columns=['chunks'])
                 df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
                 vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
             elif classes_type == ClassesType.LANGUAGE_FAMILY:
-                raise NotImplementedError
+                families = DataPicker._get_family_classes(vocabulary_setup.chunks_dir, chunks_per_fam=chunks_per_class)
+                df = pd.DataFrame(sum(families.values(), []), columns=['chunks'])
+                df['label'] = [family for family, chunks in families.items() for _ in range(len(chunks))]
+                vocabulary_setup.data = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
         # The labels are the same for all setups in a particular function call,
         # because 'classes_type' is constant in all iteration.
