@@ -98,6 +98,47 @@ class DataPicker:
 
         vocabulary_setups = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
 
+        """
+        We need to build a separate features table for each vocabulary, and then combine them (stack them horizontally).
+        For example, if the selected features were: 1K TOP WORDS, 1K TOP POS-TRI, FUNCTION WORDS, then we would
+        need to build:
+        TABLE 1 (1K TOP WORDS):
+            W1  W2  W3  ...  Wn
+        S1
+        S2
+        S3
+        ...
+        Sn
+        
+        TABLE 2 (1K TOP POS-TRI):
+            W1  W2  W3  ...  Wn
+        S1
+        S2
+        S3
+        ...
+        Sn
+        
+        TABLE 3 (FW):
+            W1  W2  W3  ...  Wn
+        S1
+        S2
+        S3
+        ...
+        Sn
+        
+        Si = sample, Wi = feature (e.g. a word).
+        
+        Now in order to fill TABLE 1, we need to sample *random* data from the tokenized DB.
+        But in order to fill TABLE 2, we need to sample data from the POS tokenized DB, such that it corresponds
+        to TABLE 1 [problem 1].
+        Then when filling up TABLE 3, surely we can re-use the data we had sampled for TABLE 1, but for simplicity we
+        sample again (of course we need to make sure we re-sample exactly the same data) [problem 2].
+        
+        [problem 1] is solved by itself, because the way the DBs are built, the order among them is guaranteed.
+        To solve [problem 2], we just use the same seed every time we sample, thus guaranteeing to sample the
+        same indices every time.
+        """
+
         for vocabulary_setup in vocabulary_setups:
             if classes_type == ClassesType.BINARY_NATIVITY:
                 native_chunks, non_native_chunks = DataPicker._get_native_non_native_classes(vocabulary_setup.chunks_dir,
