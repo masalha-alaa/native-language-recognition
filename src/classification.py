@@ -4,7 +4,6 @@ Classification
 
 import argparse
 from bisect import bisect_left
-from scipy.sparse import hstack, csr_matrix
 from src.data_picker import *
 import pandas as pd
 import numpy as np
@@ -19,6 +18,22 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
+
+
+def select_k_best(coefs_dict, feature_names, k_best):
+    # assuming features were scaled. otherwise scale them by their std: np.std(features, axis=0) * clf.coef_
+    # (right now they are scaled in 'run_classifiers()')
+    best_k_features = {}
+    for clf_name, coefs in coefs_dict.items():
+        importances = coefs[0]
+        # partition the importances array, such that the pivot is at the last -k elements
+        # (in simpler words: we get the largest argmax k elements at the end)
+        k_top_argmax = np.argpartition(importances, -k_best)[-k_best:]
+        # sort them in descending order according to their importances
+        top_k_sorted = k_top_argmax[np.argsort(importances[k_top_argmax])][::-1]
+        best_k_features[clf_name] = feature_names[top_k_sorted]
+
+    return best_k_features
 
 
 def plot_confusion_matrix(cm, classes,
@@ -77,15 +92,20 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
         X = dataframe.iloc[:, :len(dataframe.columns) - 1].copy().values
         y = dataframe.iloc[-1].values
 
+    # scale features
+    X_std = np.std(X, 0)
+    X = X.apply(lambda col: col / X_std[col.name] if X_std[col.name] != 0 else col)
+
     if classes is None:
         classes = pd.unique(y)
 
     classifiers = [(SVC(), False),
-                   (LogisticRegression(max_iter=500), True),
+                   (LogisticRegression(max_iter=500, random_state=42), True),
                    (MultinomialNB(), False),
                    (RandomForestClassifier(), False),
                    (KNeighborsClassifier(), False)]
     scores = {}
+    coefficients = {}
     for clf, run in classifiers:
         if run:
             if verbose > 1:
@@ -95,6 +115,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
             scores_, all_actual, all_predicted = classify(clf, k_fold, X, y)
             scores_avg = np.mean(scores_)
             scores[clf.__class__.__name__] = scores_
+            coefficients[clf.__class__.__name__] = clf.coef_
 
             if verbose > 1:
                 print_log(f'({datetime.now() - classification_ts})', file=results_path)
@@ -125,7 +146,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
                 print_log(scores_, file=results_path)
                 print_log(f'avg: {round(scores_avg * 100, 2)}%\n', file=results_path)
 
-    return scores
+    return scores, coefficients
 
 
 def classify(clf, K, X, y):
@@ -146,13 +167,16 @@ def classify(clf, K, X, y):
 
     for train, test in kfold.split(X):
         # Train and validate (K-Fold cross validation)
-        clf.fit(X[train], y[train])
-        predicted = clf.predict(X[test])
+        clf.fit(X.iloc[train], y[train])
+        predicted = clf.predict(X.iloc[test])
         actual = y[test]
         scores.extend([accuracy_score(actual, predicted)])
         # gather all predicted and actual for building confusion matrix
         all_predicted.extend(predicted)
         all_actual.extend(actual)
+
+    # now fit on all data (for extracting best features later) (also if want to save model...)
+    clf.fit(X, y)
 
     return scores, all_actual, all_predicted
 
@@ -173,6 +197,8 @@ def sort_a_by_b(a, b):
 
 
 if __name__ == '__main__':
+    SELECT_K_BEST = 30
+
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--verbose", default=3, type=int, help="Verbose level [0-3]")
     args = vars(ap.parse_args())
@@ -182,13 +208,13 @@ if __name__ == '__main__':
 
     # Enable / Disable any combination...
     data_types = [
-        # ClassesType.BINARY_NATIVITY,
-        # ClassesType.COUNTRY_IDENTIFICATION,
+        ClassesType.BINARY_NATIVITY,
+        ClassesType.COUNTRY_IDENTIFICATION,
         ClassesType.LANGUAGE_FAMILY
     ]
 
     feature_vector_types = [
-        # FeatureVectorType(FtrVectorEnum.ONE_K_WORDS),
+        FeatureVectorType(FtrVectorEnum.ONE_K_WORDS),
         FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI),
         FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS),
         FeatureVectorType(FtrVectorEnum.ONE_K_POS_TRI) | FeatureVectorType(FtrVectorEnum.FUNCTION_WORDS)
@@ -239,23 +265,28 @@ if __name__ == '__main__':
 
                 print('Constructing features...', end=' ')
                 ts = datetime.now()
-                ftr_table = csr_matrix([])
-                for i, data_setup in enumerate(data_setups):
+                features_df = pd.DataFrame()
+                for data_setup in data_setups:
                     data_setup.load_vectorizer()
-                    if i == 0:
-                        # first loop iteration, initiate ftr table
-                        ftr_table = data_setup.fit_transform()
-                    else:
-                        # concatenate ftr tables
-                        ftr_table = hstack([ftr_table, data_setup.fit_transform()])
-                ftr_table = ftr_table.tocsr()
+                    features_df = pd.concat([features_df,
+                                             pd.DataFrame(data_setup.fit_transform().toarray(),
+                                                          columns=data_setup.get_features())],
+                                            axis=1)
                 print(f'({datetime.now() - ts})')
 
                 print('Classifying...')
-                scores_dict = run_classifiers(X=ftr_table, y=labels.values, verbose=verbose,
-                                              results_path=results_path,
-                                              plots_path=plots_path,
-                                              classes=sort_a_by_b(pd.unique(labels), COUNTRIES_ORDER),
-                                              cm_title=config)
+                scores_dict, coefs_dict = run_classifiers(X=features_df, y=labels.values, verbose=verbose,
+                                                          results_path=results_path,
+                                                          plots_path=plots_path,
+                                                          classes=sort_a_by_b(pd.unique(labels), COUNTRIES_ORDER),
+                                                          cm_title=config)
+
+                if SELECT_K_BEST:
+                    print('Getting best features...')
+                    best_features = select_k_best(coefs_dict, features_df.columns, SELECT_K_BEST)
+                    print_k_best = ''
+                    for clf_name, best_k_ftrs in best_features.items():
+                        print_k_best += f'{clf_name}:\n{best_k_ftrs}\n'
+                    print_log(print_k_best)
 
                 print(f'\nTOTAL TIME: {datetime.now() - ts}')

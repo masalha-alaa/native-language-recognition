@@ -88,6 +88,10 @@ class SetupClass:
             raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
         return self._vectorizer.fit_transform(self.data[self.data.columns[0]])  # TODO: Write this in a better way
 
+    def get_features(self):
+        if self._vectorizer:
+            return sorted(self._vectorizer.vocabulary_.keys(), key=lambda ftr: self._vectorizer.vocabulary_[ftr])
+
     @property
     def chunks_dir(self):
         return self._chunks_dir
@@ -111,6 +115,10 @@ class ModelConfiguration:
         """
         Extract words from (word, count) list.
         """
+        # TODO: This is done because of the way vocabularies were saved. But in reality it's not needed.
+        #  We should ditch the values count from the vocabularies - we don't need them.
+        #  Or just save them in metadata files.
+        #  After doing that, this whole function can be dismissed.
         if isinstance(vocabulary[0], tuple):
             if isinstance(vocabulary[0][0], tuple):
                 return [' '.join(pair[0]) for pair in vocabulary]
