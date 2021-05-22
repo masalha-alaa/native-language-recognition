@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: BINARY
+500 chunks per class
+LogisticRegression (0:00:00.903033)
+[0.99, 0.98, 0.96, 0.96, 0.94, 0.99, 0.97, 0.96, 1.0, 0.95]
+avg: 97.0%
+
+LogisticRegression best 50 features (most to least important):
+mostly, tho, except, biggest, guess, problems, times, de, basically, summer, rules, mother, dialect, considered, indeed, every, sea, snow, tv, case, maybe, without, region, dont, almost, cases, yes, close, village, between, known, translation, languages, started, friends, hungarian, coffee, russian, otherwise, university, border, share, swedish, name, 10, rich, meaning, open, small, everybody
+

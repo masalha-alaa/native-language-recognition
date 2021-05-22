@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: FUNCTION WORDS
+FeatureVectorValues: TFIDF
+300 chunks per class
+LogisticRegression (0:00:01.231106)
+[0.6416666666666667, 0.575, 0.575, 0.6166666666666667, 0.6416666666666667, 0.675, 0.75, 0.6, 0.625, 0.7]
+avg: 64.0%
+
+LogisticRegression best 50 features (most to least important):
+the, to, of, was, be, as, an, up, all, on, would, this, out, its, have, been, they, than, over, how, though, my, off, what, although, get, any, being, into, when, could, who, down, always, us, too, within, fair, may, around, enough, like, back, anywhere, said, through, unless, ye, must, your
+

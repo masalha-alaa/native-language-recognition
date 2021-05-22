@@ -11,7 +11,7 @@ ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 CONTROL_DB = 'dataset control db'
 DB_DIR = ROOT_DIR / "dataset 2021-05-16 16-56-59"
-# DB_DIR = ROOT_DIR / CONTROL_DB
+# DB_DIR = ROOT_DIR / "dataset 2021-05-22 18-05-00"
 TOKEN_CHUNKS_DIR = DB_DIR / "token_chunks_2000"
 POS_CHUNKS_DIR = DB_DIR / "pos_chunks_2000"
 RAW_DIR_NAME = 'raw'

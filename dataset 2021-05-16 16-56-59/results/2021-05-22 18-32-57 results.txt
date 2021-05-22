@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: TFIDF
+300 chunks per class
+LogisticRegression (0:00:02.046596)
+[0.975, 0.9916666666666667, 1.0, 0.9916666666666667, 0.975, 1.0, 0.9833333333333333, 0.9833333333333333, 0.9833333333333333, 0.9916666666666667]
+avg: 98.75%
+
+LogisticRegression best 50 features (most to least important):
+irish, ireland, the, to, of, uk, british, england, english, was, new, be, scotland, london, an, this, as, up, don, all, ve, on, britain, would, they, scottish, out, world, re, brexit, wales, have, america, think, its, than, how, what, been, polish, chinese, like, thought, over, northern, though, my, fucking, native, when
+

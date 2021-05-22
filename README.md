@@ -3,7 +3,8 @@
 3. Manually clean out (merge etc.)
 4. preprocessing.py
 5. data_visualization.py
-6. features_bldr.py 
+6. features_bldr.py
+7. classification.py
 
 
 Paper:

@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K POS TRI
+FeatureVectorValues: FREQUENCY
+300 chunks per class
+LogisticRegression (0:00:02.040874)
+[0.725, 0.6166666666666667, 0.6083333333333333, 0.6083333333333333, 0.625, 0.6333333333333333, 0.6916666666666667, 0.6666666666666666, 0.6583333333333333, 0.6416666666666667]
+avg: 64.75%
+
+LogisticRegression best 50 features (most to least important):
+in dt nnp, prp vbp jj, in nnp nnp, nn in dt, vbp jj nn, dt jj nn, dt nn in, nn in nnp, dt nnp nnp, nnp prp vbp, nn prp vbp, nns in nnp, nnp in dt, nnp vbz dt, to vb dt, prp vbp dt, vbz dt nn, vbg to vb, nnp nnp in, prp vbp vbn, jj nn prp, nnp in nnp, nnp cc nnp, nnp nnp cc, in prp vbd, dt nnp nn, nnp nnp prp, wrb prp vbd, vbg dt nn, vbd dt jj, dt nnp in, nnp nnp vbd, nnp in prp, jj in dt, jj nn to, dt nn nn, dt jj nnp, prp vbp nns, vb dt jj, vbd dt nn, in nnp cc, cc nnp nnp, dt nnp cc, prp vbd in, prp vbd dt, vbp dt jj, prp vbd prp, nns prp vbp, in dt jj, nns md vb
+

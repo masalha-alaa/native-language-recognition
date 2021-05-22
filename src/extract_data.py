@@ -9,6 +9,7 @@ if __name__ == '__main__':
     input_dir = DB_DIR
     input_file = f'data{PKL_DIC_EXT}'
     output_dir = RAW_DATA_DIR
+    output_dir.mkdir(exist_ok=True)
 
     with open(input_dir / input_file, mode='rb') as f:
         data = load(f)

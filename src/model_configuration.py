@@ -86,7 +86,17 @@ class SetupClass:
     def fit_transform(self):
         if self._vectorizer is None:
             raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
-        return self._vectorizer.fit_transform(self.data[self.data.columns[0]])  # TODO: Write this in a better way
+        # TODO: Save fitted vectorizers.
+        return self._vectorizer.fit_transform(self.x_data)
+
+    @property
+    def x_data(self):
+        # TODO: Write this in a better way
+        return self.data[self.data.columns[0]]
+
+    @property
+    def ngrams(self):
+        return self._ngrams
 
     def get_features(self):
         if self._vectorizer:

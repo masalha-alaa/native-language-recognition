@@ -3,11 +3,17 @@ Data visualization in graphs etc.
 """
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from paths import *
 import os
 import re
 import numpy as np
 from pickle import load
+from typing import List
+from sklearn.feature_extraction.text import CountVectorizer
+from src.model_configuration import SetupClass  # just for type hinting
+import plotly.figure_factory as ff
+from datetime import datetime
 
 
 def new_figure(title, xlabel, ylabel, x, y):
@@ -56,6 +62,44 @@ def median_sentence_len(input_dir, output_dir, method='average', show=True, save
         if show:
             plt.show()
         plt.close()
+
+
+def _scale(column, new_range):
+    old_range = (column.min(), column.max())
+    return (((column - old_range[0]) * (new_range[1] - new_range[0])) / (old_range[1] - old_range[0])) + new_range[0]
+
+
+def viz_occurrences(k_best, classes, data_setups: List[SetupClass], show=True, save=False):
+    features_df = pd.DataFrame()
+    for data_setup in data_setups:
+        # get features specific to this vectorizer
+        vocabulary = sorted(set(k_best) & set(data_setup.get_features()))
+        vectorizer = CountVectorizer(vocabulary=vocabulary, ngram_range=data_setup.ngrams)
+        features_df = pd.concat([features_df,
+                                 pd.DataFrame(vectorizer.fit_transform(data_setup.x_data).toarray(), columns=vocabulary)],
+                                axis=1)
+    features_df.index = classes.values
+    # prepare heat map
+    hm = features_df.groupby(features_df.index).sum()
+    # display it
+    fig = ff.create_annotated_heatmap(z=(hm.apply(lambda col: _scale(col, (0, 1)))).values,
+                                      annotation_text=hm.values,
+                                      text=hm.values,
+                                      x=hm.columns.to_list(),
+                                      y=hm.index.to_list(),
+                                      hoverinfo='x+y+text',
+                                      colorscale='Blues')
+    fig['layout']['yaxis']['autorange'] = "reversed"
+    fig.update_layout(title=dict(text='Heatmap', y=0.03, x=0.5, xanchor='center', yanchor='bottom'),
+                      title_font=dict(size=24),
+                      xaxis_title='Best Features',
+                      yaxis_title='Classes')
+    if save:
+        fig.write_html(str(RESULTS_DIR / f'{datetime.now().strftime(DATE_STR_SHORT)} hm.html'))
+    if show:
+        fig.show()
+
+    return fig
 
 
 def chunks_count(input_dir, output_dir, show=True, save=False):

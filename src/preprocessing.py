@@ -37,7 +37,8 @@ def clean_data(params):
                             fw.write(f'{clean_line}\n')
 
 
-def sentecize_data(input_dir, output_dir):
+def sentecize_data(input_dir, output_dir, shuffle=False):
+    sentences = []
     for i, filename in enumerate(os.listdir(input_dir)):
         if filename.endswith('.txt'):
             print(f'{i + 1}. {filename}')
@@ -47,7 +48,15 @@ def sentecize_data(input_dir, output_dir):
                         for sentence in re.split(r"(?<=[A-Za-z][A-Za-z])[.?\n!]+|(?<=[0-9)\}\]])[.?\n!]+", line):
                             stripped_sentence = sentence.strip()
                             if len(stripped_sentence) > 2:
-                                fw.write(f'{stripped_sentence}\n')
+                                if shuffle:
+                                    sentences.append(stripped_sentence)
+                                else:
+                                    fw.write(f'{stripped_sentence}\n')
+    if shuffle:
+        random.seed(SEED)
+        random.shuffle(sentences)
+        for sentence in sentences:
+            fw.write(f'{sentence}\n')
 
 
 def tokenize_data(input_dir, output_dir):
@@ -95,7 +104,7 @@ if __name__ == '__main__':
     # ESTIMATED TOTAL TIME: 25.5 MINUTES
 
     CLEAN = True
-    SENTENCIZE = True
+    SENTENCIZE, SHUFFLE = True, True
     TOKENIZE = True
     CHUNKIFY_TOKENS = True
     POSIFY = True
@@ -133,10 +142,8 @@ if __name__ == '__main__':
         # Quick
         print('Sentecizing...')
         sentences_output_dir.mkdir(exist_ok=True)
-        sentecize_data(clean_output_dir, sentences_output_dir)
+        sentecize_data(clean_output_dir, sentences_output_dir, shuffle=SHUFFLE)
         print(f'{datetime.now()}\n')
-
-    # TODO: Should shuffle here
 
     if TOKENIZE:
         # 4 minutes

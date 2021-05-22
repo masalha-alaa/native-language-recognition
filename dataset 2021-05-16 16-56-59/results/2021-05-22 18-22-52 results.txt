@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K POS TRI & FUNCTION WORDS
+FeatureVectorValues: FREQUENCY
+500 chunks per class
+LogisticRegression (0:00:00.762077)
+[0.95, 0.91, 0.91, 0.92, 0.89, 0.92, 0.9, 0.94, 0.9, 0.94]
+avg: 91.8%
+
+LogisticRegression best 50 features (most to least important):
+nn nn nn, and, nnp nnp nnp, is, are, in, we, vbp rb vb, nn in nnp, nnp nn nn, jj nn nn, that, not, prp vbz rb, jj nn in, in jj nn, nn jj nn, with, some, also, nn nnp nn, even, for, prp rb vbp, like, nn nn nnp, dt nn vbz, jj nn nnp, nn vbz rb, jj nnp nnp, in jj nns, jj nns in, vb dt nn, one, but, nns in nn, jj cc jj, in nn cc, dt jj nns, in nn nn, nnp nn nnp, rb vb in, nnp nnp nn, by, in nnp nn, jj nn vbz, nn jj nnp, nn nnp nnp, vbz rb jj, nns vbp rb
+

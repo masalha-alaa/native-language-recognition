@@ -64,10 +64,10 @@ class DataPicker:
         return native_chunks, non_native_chunks
 
     @staticmethod
-    def _get_country_classes(input_path, chunks_per_country=50):
+    def _get_country_classes(input_path, chunks_per_country=50, countries_set=None):
         d = {}
         for chunks_file in os.listdir(input_path):
-            if chunks_file.endswith(PKL_LST_EXT):
+            if chunks_file.endswith(PKL_LST_EXT) and (countries_set is None or chunks_file.replace(PKL_LST_EXT, '') in countries_set):
                 chunks = DataPicker._sample_random_chunks(input_path / chunks_file,
                                                           chunks_per_country, chunks_per_country)
                 chunks = [''.join(chunk) for chunk in chunks]  # convert each chunk to one long string.
@@ -148,7 +148,9 @@ class DataPicker:
                 vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
             elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
-                countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir, chunks_per_country=chunks_per_class)
+                countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir,
+                                                            chunks_per_country=chunks_per_class,
+                                                            countries_set=set(COUNTRIES_ORDER))  # not all countries
                 df = pd.DataFrame(sum(countries.values(), []), columns=['chunks'])
                 df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
                 vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)

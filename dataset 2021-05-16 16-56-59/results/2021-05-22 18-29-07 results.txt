@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: FUNCTION WORDS
+FeatureVectorValues: FREQUENCY
+75 chunks per class
+LogisticRegression (0:00:03.831713)
+[0.3055555555555556, 0.22777777777777777, 0.3055555555555556, 0.2722222222222222, 0.2611111111111111, 0.24444444444444444, 0.2611111111111111, 0.3, 0.25555555555555554, 0.3055555555555556]
+avg: 27.39%
+
+LogisticRegression best 50 features (most to least important):
+that, for, the, or, my, also, you, are, there, at, with, them, from, do, which, get, an, not, well, even, and, where, has, he, many, never, some, those, if, too, still, because, am, after, about, way, out, far, something, without, always, two, again, only, while, into, then, rather, maybe, tell
+

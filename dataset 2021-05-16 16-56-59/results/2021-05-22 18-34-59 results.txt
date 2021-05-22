@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K POS TRI & FUNCTION WORDS
+FeatureVectorValues: TFIDF
+300 chunks per class
+LogisticRegression (0:00:03.130112)
+[0.8083333333333333, 0.7333333333333333, 0.725, 0.725, 0.7333333333333333, 0.7833333333333333, 0.8666666666666667, 0.7916666666666666, 0.7833333333333333, 0.7833333333333333]
+avg: 77.33%
+
+LogisticRegression best 50 features (most to least important):
+in dt nnp, to, the, prp vbp jj, of, in nnp nnp, vbp jj nn, nn in dt, be, was, dt jj nn, dt nnp nnp, an, as, up, nnp vbz dt, nnp prp vbp, nn in nnp, nn prp vbp, would, nns in nnp, all, vbg to vb, nnp nnp vbd, on, nnp nnp in, vbz dt nn, cc nnp nnp, prp vbd nnp, nnp nnp prp, prp vbp vbn, nnp in dt, dt nn in, dt nnp vbz, nnp nnp cc, wrb prp vbd, prp vbp dt, prp vbz prp, dt nnp in, dt nnp cc, nnp vbd dt, nnp in nnp, jj nn prp, nnp cc nnp, prp vbp nns, rb vbg to, its, prp vbp vb, dt nnp prp, this
+

@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: TFIDF
+500 chunks per class
+LogisticRegression (0:00:00.497008)
+[0.99, 0.97, 0.97, 0.98, 0.97, 0.92, 0.99, 0.97, 0.96, 0.98]
+avg: 97.0%
+
+LogisticRegression best 50 features (most to least important):
+and, is, are, we, russian, in, czech, greek, turkish, swedish, croatia, hungarian, portuguese, sweden, ukraine, turkey, finland, hungary, iceland, german, portugal, also, danish, belgium, with, russia, not, even, switzerland, some, austria, finnish, swiss, greece, denmark, de, for, romania, but, one, romanian, like, french, there, by, norway, same, well, our, norwegian
+

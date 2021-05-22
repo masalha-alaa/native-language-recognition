@@ -3,7 +3,7 @@ Classification
 """
 
 import argparse
-from my_random import SEED
+from src.data_visualization import viz_occurrences
 from bisect import bisect_left
 from src.data_picker import *
 import pandas as pd
@@ -22,11 +22,12 @@ from sklearn.model_selection import KFold
 
 
 def select_k_best(coefs_dict, feature_names, k_best):
-    # assuming features were scaled. otherwise scale them by their std: np.std(features, axis=0) * clf.coef_
+    # assuming coefficients were scaled.
     # (right now they are scaled in 'run_classifiers()')
+    # Source: https://stackoverflow.com/a/34052747/900394
     best_k_features = {}
     for clf_name, coefs in coefs_dict.items():
-        importances = coefs[0]
+        importances = coefs
         # partition the importances array, such that the pivot is at the last -k elements
         # (in simpler words: we get the largest argmax k elements at the end)
         k_top_argmax = np.argpartition(importances, -k_best)[-k_best:]
@@ -56,7 +57,7 @@ def plot_confusion_matrix(cm, classes,
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Drawing normalized confusion matrix...")
     else:
-        print('Drawing confusion matrix, without normalization...')
+        print('Drawing confusion matrix...')
 
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
@@ -93,10 +94,6 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
         X = dataframe.iloc[:, :len(dataframe.columns) - 1].copy().values
         y = dataframe.iloc[-1].values
 
-    # scale features
-    X_std = np.std(X, 0)
-    X = X.apply(lambda col: col / X_std[col.name] if X_std[col.name] != 0 else col)
-
     if classes is None:
         classes = pd.unique(y)
 
@@ -116,7 +113,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
             scores_, all_actual, all_predicted = classify(clf, k_fold, X, y)
             scores_avg = np.mean(scores_)
             scores[clf.__class__.__name__] = scores_
-            coefficients[clf.__class__.__name__] = clf.coef_
+            coefficients[clf.__class__.__name__] = np.std(X, axis=0) * clf.coef_[0]
 
             if verbose > 1:
                 print_log(f'({datetime.now() - classification_ts})', file=results_path)
@@ -137,7 +134,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
 
                     if plots_path:
                         # fig.set_size_inches((4, 3), forward=False)
-                        fig.set_size_inches((0.22 * len(classes) + 3.8, 0.16 * len(classes) + 2.8), forward=False)
+                        fig.set_size_inches((0.22 * len(classes) + 3.8, 0.16 * len(classes) + 3), forward=False)
                         plt.savefig(plots_path / f'{datetime.now().strftime(DATE_STR_SHORT)} cm.png',
                                     bbox_inches='tight', dpi=170)
                     plt.show()
@@ -166,6 +163,19 @@ def classify(clf, K, X, y):
     all_actual = []
     all_predicted = []
 
+    """
+    Important note:
+    The features in X are filled using CountVectorizer and/or TfidfVectorizer.
+    Normally, we should train (fit) the Vectorizers on the training set, and transform them on the test set.
+    However, since we didn't initially split the data to train and test sets, but chose to work with cross validation,
+    the Vectorizers were trained on the whole data. But even though we're using cross validation, the correct thing
+    to do is to train the Vectorizers repetitively in each split on the corresponding training set, and transform
+    them (in each split) on the corresponding test set. Otherwise we might suffer from data leakage.
+    However, since all our data is from the same domain, and it was shuffled randomly, this won't affect the results
+    in our situation. BUT, to use this (trained) model on a new dataset from a different domain, the trained (fitted)
+    Vectorizers need to be saved, and then transformed on the new test set.
+    This code is not written yet, and thus the model is not a production-ready model.
+    """
     for train, test in kfold.split(X):
         # Train and validate (K-Fold cross validation)
         clf.fit(X.iloc[train], y[train])
@@ -178,6 +188,7 @@ def classify(clf, K, X, y):
 
     # now fit on all data (for reliably extracting best features later) (also if want to save model...)
     clf.fit(X, y)
+    # TODO: Save model
 
     return scores, all_actual, all_predicted
 
@@ -242,7 +253,7 @@ if __name__ == '__main__':
                 if data_type == ClassesType.BINARY_NATIVITY:
                     chunks_per_class = 500
                 elif data_type == ClassesType.COUNTRY_IDENTIFICATION:
-                    chunks_per_class = 50
+                    chunks_per_class = 75
                 elif data_type == ClassesType.LANGUAGE_FAMILY:
                     chunks_per_class = 300
                 else:
@@ -280,10 +291,13 @@ if __name__ == '__main__':
                 if SELECT_K_BEST:
                     print('Getting best features...')
                     best_features = select_k_best(coefs_dict, features_df.columns, SELECT_K_BEST)
-                    print_k_best = ''
                     for clf_name, best_k_ftrs in best_features.items():
-                        print_k_best += f"{clf_name} best {SELECT_K_BEST} features (most to least important):\n" \
-                                        f"{', '.join(best_k_ftrs.tolist())}\n"
-                    print_log(print_k_best, file=results_path)
+                        print_k_best = f"{clf_name} best {SELECT_K_BEST} features (most to least important):\n" \
+                                       f"{', '.join(best_k_ftrs.tolist())}\n"
+                        print_log(print_k_best, file=results_path)
+                        print('Drawing heatmap...')
+                        if data_type != ClassesType.BINARY_NATIVITY:
+                            viz_occurrences(best_k_ftrs, labels, data_setups, show=False, save=True)
 
+                print(f'Results:\n{RESULTS_DIR}')
                 print(f'TOTAL TIME: {datetime.now() - ts}\n')

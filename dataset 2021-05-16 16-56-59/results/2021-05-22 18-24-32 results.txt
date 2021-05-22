@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: FREQUENCY
+75 chunks per class
+LogisticRegression (0:00:06.644396)
+[0.8666666666666667, 0.8388888888888889, 0.8277777777777777, 0.7722222222222223, 0.8333333333333334, 0.7666666666666667, 0.8444444444444444, 0.8555555555555555, 0.7444444444444445, 0.8666666666666667]
+avg: 82.17%
+
+LogisticRegression best 50 features (most to least important):
+that, austria, german, the, for, or, my, austrian, also, you, are, there, at, really, with, them, from, germany, do, get, which, just, an, not, well, even, where, has, he, think, many, never, and, those, some, if, too, germans, still, know, because, am, yeah, course, after, about, die, way, out, far
+

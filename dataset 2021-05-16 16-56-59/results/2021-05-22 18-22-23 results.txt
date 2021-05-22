@@ -1,0 +1,11 @@
+ClassesType: BINARY NATIVITY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: FREQUENCY
+500 chunks per class
+LogisticRegression (0:00:00.461651)
+[0.9, 0.94, 0.92, 0.94, 0.89, 0.87, 0.91, 0.94, 0.89, 0.96]
+avg: 91.6%
+
+LogisticRegression best 50 features (most to least important):
+and, is, in, are, we, with, not, also, some, even, for, but, like, one, that, german, russian, there, by, or, well, our, same, from, which, very, greek, do, because, russia, other, more, sweden, here, czech, french, only, country, swedish, turkey, since, will, finland, name, turkish, most, every, know, you, ukraine
+

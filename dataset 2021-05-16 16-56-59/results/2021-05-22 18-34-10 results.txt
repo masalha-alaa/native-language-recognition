@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K POS TRI & FUNCTION WORDS
+FeatureVectorValues: BINARY
+300 chunks per class
+LogisticRegression (0:00:31.388773)
+[0.575, 0.6083333333333333, 0.6, 0.5333333333333333, 0.65, 0.5166666666666667, 0.7083333333333334, 0.625, 0.65, 0.6416666666666667]
+avg: 61.08%
+
+LogisticRegression best 50 features (most to least important):
+prp vbd nnp, dt nnp prp, rb vbg to, dt nnp vbz, off, unless, vbp jj nn, nnp nnp vbd, prp vbp nns, prp vbz prp, although, jj nn vbp, in nnp pos, fair, md vb nns, over, in dt cd, through, vb jj to, enough, nnp rb rb, nnp vbd dt, anywhere, rb rb vbg, jj nnp cc, vbp jj rb, ah, myself, pdt dt nn, vbd in nnp, nnp vbd jj, vbz dt nnp, rp dt nn, around, in dt rb, gets, nnp to vb, prp dt jj, prp to vb, despite, nns md vb, in nnp vbp, cc nnp nnp, in wrb prp, done, dt vbz in, vb rb jj, within, vb nnp nnp, dt cd nn
+

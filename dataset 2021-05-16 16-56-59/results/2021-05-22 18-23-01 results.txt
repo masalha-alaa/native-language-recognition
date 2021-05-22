@@ -1,0 +1,11 @@
+ClassesType: COUNTRY IDENTIFICATION
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: BINARY
+75 chunks per class
+LogisticRegression (0:01:23.803704)
+[0.8944444444444445, 0.8555555555555555, 0.8888888888888888, 0.8833333333333333, 0.8333333333333334, 0.8722222222222222, 0.8555555555555555, 0.9055555555555556, 0.8722222222222222, 0.8611111111111112]
+avg: 87.22%
+
+LogisticRegression best 50 features (most to least important):
+austrian, austria, germans, switzerland, rather, standard, again, die, without, course, everybody, dialect, germany, official, german, either, oh, deal, rural, empire, problem, tbh, guy, version, off, somewhere, else, totally, nowadays, sentence, border, look, wanted, mind, hungary, set, once, further, otherwise, region, stuff, nazi, instead, x200b, using, forget, close, far, special, easier
+

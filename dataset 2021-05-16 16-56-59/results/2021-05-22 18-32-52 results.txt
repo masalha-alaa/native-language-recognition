@@ -1,0 +1,11 @@
+ClassesType: LANGUAGE FAMILY
+FeatureVectorType: ONE K WORDS
+FeatureVectorValues: FREQUENCY
+300 chunks per class
+LogisticRegression (0:00:01.801451)
+[0.8833333333333333, 0.9166666666666666, 0.9083333333333333, 0.8916666666666667, 0.8916666666666667, 0.9333333333333333, 0.9, 0.8666666666666667, 0.9, 0.9583333333333334]
+avg: 90.5%
+
+LogisticRegression best 50 features (most to least important):
+the, to, ireland, of, irish, english, was, be, uk, as, an, up, all, british, this, on, ve, would, new, re, england, have, out, they, think, than, been, its, how, my, what, don, just, world, though, get, when, scotland, over, like, people, london, who, any, us, being, too, could, always, me
+
