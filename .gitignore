@@ -2,10 +2,8 @@
 /venv
 *.pkl
 *.pkl_dic
-*.pkl_lst
 /__pycache__
 clean
-features
 pos
 pos_chunks_2000
 raw
