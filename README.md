@@ -94,6 +94,7 @@ In this project I have successfully reproduced the authors' results in identifyi
 1. Database size (theirs is much larger).
 2. Database cleaning (for example, they replaced URLs with the URL token, whereas I simply removed them; and replaced non-English words with the UNK token, whereas I treated them as normal tokens).
 3. Their token tagging was more accurate, as a result of using Spacy[[5]](#5) for named entities identification, as well as the 'truecasing' technique to distinguish between abbreviations and regular words such as 'US' (United States) and 'us' (pronoun).
+4. The authors might have unified the English speaking countries into 1 class in the Language Classification task (Task 2). I did not do that because unfortuntaely I could not determine from the paper if they have actually done that or not. But obviously if I do this unification the results would be significantly higher in the Language Classfication task.
 
 ### Discalimer
 I personally know the authors of the paper, and they have guided me through a simplified version of this project back in my MSc studies, and now 4 years later as I'm more skillful and advanced in the ML field and in programming in general, I have decided to create it by my own from scratch.
