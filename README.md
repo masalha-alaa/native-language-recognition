@@ -95,6 +95,8 @@ In this project I have successfully reproduced the authors' results in identifyi
 2. Database cleaning (for example, they replaced URLs with the URL token, whereas I simply removed them; and replaced non-English words with the UNK token, whereas I treated them as normal tokens).
 3. Their token tagging was more accurate, as a result of using Spacy[[5]](#5) for named entities identification, as well as the 'truecasing' technique to distinguish between abbreviations and regular words such as 'US' (United States) and 'us' (pronoun).
 
+### Discalimer
+I personally know the authors of the paper, and they have guided me through a simplified version of this project back in my MSc studies, and now 4 years later as I'm more skillful and advanced in the ML field and in programming in general, I have decided to create it by my own from scratch.
 
 ## Resources
 <a id="1">[1]</a>
