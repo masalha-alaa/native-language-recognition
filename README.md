@@ -59,7 +59,7 @@ First, for a sanity check, I built a simple classifier using the binary occurren
 
 <img src="https://raw.githubusercontent.com/masalha-alaa/native-language-detection/master/docs/images/cm%20binary%20nativity%201k%20words.png" alt="Binary Nativity Confusion Matrix, 97% accuracy" width="666">
 
-Although this has achieved a very high accuracy, it is an expected and not a very interesting result. As mentioned earlier, the main interest here is to perform the task relying only on semantic features. Thus, I built another classifier, this time using the top 1000 POS trigrams and a list of widely used English function words (for example see [[4]](#4) for common English function words). The results were quite satisfying as well (about the same as the authors' results):
+Although this has achieved a very high accuracy, it is an expected and not a very interesting result. As mentioned earlier, the main interest here is to perform the task by relying only on semantic features. Thus, I built another classifier, this time using the top 1000 POS trigrams and a list of widely used English function words (for example see [[4]](#4) for common English function words). The results were quite satisfying as well (about the same as the authors' results):
 
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20binary%20nativity%20fw%20%26%201k%20pos.png" alt="Binary Nativity Confusion Matrix, 93% accuracy" width="666">
 
