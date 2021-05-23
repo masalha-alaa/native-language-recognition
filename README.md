@@ -43,7 +43,7 @@ The authors have divided their work to 3 tasks:
 
 <sup>2</sup>*Actually it's not clear to me whether it was 31 or 39+6 (45) from the paper. I went on with 31.*
 
-The authors report the following accuracy results for tasks 1,2,3 respectively: 90.8%, 60.8%, 82.5%.
+The authors report the following accuracy results for tasks 1,2,3 respectively: 90.8%, 60.8%, 82.5% (using 10 fold cross validation).
 It's worth mentioning that the authors have relied solely on lexical semantic features, opposed to context and social network features which they have mentioned in their other paper [[2]](#2). For example some of the features they mention are part of speech (POS) ngrams, function words, and most common words in the database. This is important mainly because the task of the paper (as its title implies) is to recognize the cognate effects of the posters first language (L1) which are reflected on their second language (L2). I.e. they hypothesize that the effect of L1 is so powerful (in means of word and grammar choice) that it's clearly reflected on L2. For example, it turns out that French people use the combination "JJ NN NNP" ('Adjective' 'Noun' 'Proper Noun') twice as much as UK people.
 
 Hereby I try to reproduce the authors results with my own model.
