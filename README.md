@@ -14,8 +14,10 @@ It's worth mentioning, however, that the authors' dataset is much larger than mi
 
 ## Running the code
 In order to run the code, please follow the following steps:
+0. Install Python.
 1. Clone the repository.
-2. Run `install_dependencies.py` to setup the virtual environment and install the required libraries.
+2. Run `install_dependencies.bat` (Windows) or `install_dependencies.sh` (Linux) to setup the virtual environment and install the required libraries.
+<br>From now onward, you should be running the scripts from inside the virtual environment.<br>
 <br>*If you want to use the existing database, skip to step 9.*<br>
 3. Create a reddit app at: [reddit authorized apps](https://www.reddit.com/prefs/apps).
 4. Run the script `fetch_data.py` with your app's client ID, secret, and your user agent:<br>
