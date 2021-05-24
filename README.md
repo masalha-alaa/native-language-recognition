@@ -72,7 +72,7 @@ Once again, using the top 1000 words binary features, I achieved very good resul
 
 As mentioned earlier, these results are not interesting, but merely serve as a sanity check for the database. However, it might be fun to examine the most important features determined by the classifier (**click the image for an interactive plot _(produced by PlotLy)_**):
 
-[![Heatmap - country 1k words tfidf](https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/hm%20country%20identification%201k%20words.png)](https://rawcdn.githack.com/masalha-alaa/native-language-detection/032a80e49652f0f27c09ed25835a44702fed4e4a/docs/2021-05-22%2018-25-01%20hm.html)
+[![Heatmap - country 1k words tfidf](https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/hm%20country%20identification%201k%20words.png)](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/ea009af7ad125bb2ac2cc5d8b0201165ef632f84/docs/2021-05-22%2018-25-01%20hm.html)
 
 This is a column-wise heatmap, in which the rows are classes (countries) and the columns are features selected as "best features" by the classifier, such that cell **\[i,j\]** is how many times the word **j** appeared in documents of class **i**. Being a column-wise heatmap, it grants us the benefit of easily identifing the features spread over the different countries. For example we can see that the words "austria" and "austrian" are mostly used by Austrian authors, whereas the words "german" / "germans" / "germany" by German authors, and so on. Interestingly enough, "beer" is mostly used by Germans and Slovakians alike.
 
@@ -80,7 +80,7 @@ Moving on to the more interesting semantic features results, here is the confusi
 
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20country%20identification%20fw%20%26%201k%20pos.png" alt="Country Identification FW & 1K POS TRI 53.7% accuracy" width="666">
 
-As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 53.7% (authors' is 60.8%). As explained earlier, the random chance baseline accuracy would be 3%, so 53% and 60% are very high accuracies compared to that ([click to see a heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-detection/8bb64c462939e9df270a451fcf400a8f01b593c4/docs/2021-05-22%2018-32-37%20hm.html)).
+As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 53.7% (authors' is 60.8%). As explained earlier, the random chance baseline accuracy would be 3%, so 53% and 60% are very high accuracies compared to that ([click to see a heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/9d055ede75b1da92bb42bb5c05baa4ef7c40fa2f/docs/2021-05-22%2018-32-37%20hm.html)).
 Also, notice that most errors occur between "close countries" (countries in the same language family) - such as all the English speaking countries, or the Romance-language countries, which leads us to the 3rd and final classification task.
 
 #### Task 3 - Language Family Classification
