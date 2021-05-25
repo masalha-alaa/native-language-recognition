@@ -1,6 +1,6 @@
 
 # Native Language Recognition
-This project is an attempt to implement the paper **Native Language Cognate Effects on Second Language Lexical Choice** [[1]](#1), in which the authors try to distinguish the native languages of Reddit posters, relying on their Reddit posts which were written in English, using Machine Learning (ML) and Natural Languages Processing (NLP)
+This project is an attempt to implement the paper **Native Language Cognate Effects on Second Language Lexical Choice** [[1]](#1), in which the authors try to distinguish the native languages of Reddit posters, relying on their Reddit posts which were written in English, using Machine Learning (ML) and Natural Languages Processing (NLP).
 
 Although the authors have released both their dataset and cleanup code publicly, I've created this project from scratch, including fetching and cleaning the reddit posts using the PRAW library [[3]](#3) by myself.
 The choice of the subreddits to fetch the data from, is based on several aspects, such as mother tongue variety and, most importantly, labels. The authors have picked subreddits that the user **flair tag** is almost guaranteed<sup>1</sup> to be their country of origin (e.g. Germany / US / Spain / etc.).
