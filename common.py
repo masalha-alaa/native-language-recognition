@@ -15,12 +15,18 @@ NATIVE_COUNTRIES = {'Australia', 'England', 'Ireland', 'Scotland', 'Wales', 'UK'
 #                    'Greece', 'Estonia', 'Finland', 'Turkey', 'Israel', 'Palestine', 'Hungary']
 
 # Here we have only the countries that were used in the paper (to dismiss other countries in the DB):
-COUNTRIES_ORDER = ['UK', 'England', 'Scotland', 'Wales', 'Ireland',
-                   'New Zealand', 'Australia',
-                   'US', 'Canada',
-                   'Austria', 'Germany', 'Netherlands', 'Norway', 'Sweden',
-                   'Bulgaria', 'Croatia', 'Slovenia', 'Serbia', 'Lithuania', 'Poland', 'Latvia', 'Russia', 'Slovakia', 'Czech Republic', 'Ukraine',
-                   'France', 'Italy', 'Portugal', 'Romania', 'Spain']
+COUNTRIES_FAM_ORDER = ['UK', 'England', 'Scotland', 'Wales', 'Ireland',
+                       'New Zealand', 'Australia',
+                       'US', 'Canada',
+                       'Austria', 'Germany', 'Netherlands', 'Norway', 'Sweden',
+                       'Bulgaria', 'Croatia', 'Slovenia', 'Serbia', 'Lithuania', 'Poland', 'Latvia', 'Russia', 'Slovakia', 'Czech Republic', 'Ukraine',
+                       'France', 'Italy', 'Portugal', 'Romania', 'Spain']
+
+
+COUNTRIES_FAM_ABC_ORDER = ['Australia', 'Canada', 'England', 'Ireland', 'New Zealand', 'Scotland', 'UK', 'US', 'Wales',
+                           'Austria', 'Germany', 'Netherlands', 'Norway', 'Sweden'
+                           'Bulgaria', 'Croatia', 'Czech Republic', 'Latvia', 'Lithuania', 'Poland', 'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Ukraine'
+                           'France', 'Italy', 'Portugal', 'Romania', 'Spain']
 
 
 class LanguageFamilies:

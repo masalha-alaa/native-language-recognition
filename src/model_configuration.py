@@ -74,6 +74,7 @@ class SetupClass:
         self._ngrams = ngrams
         self._vectorizer = None
         self.data = None
+        self.fitted = False
 
     def load_vectorizer(self):
         if self._feature_vector_values_type == FeatureVectorValues.BINARY:
@@ -87,7 +88,17 @@ class SetupClass:
         if self._vectorizer is None:
             raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
         # TODO: Save fitted vectorizers.
+        self.fitted = True
         return self._vectorizer.fit_transform(self.x_data)
+
+    def get_vocabulary(self):
+        if self._vectorizer is not None:
+            if self.fitted:
+                return self._vectorizer.vocabulary_
+            else:
+                raise RuntimeError(f'Vectorizer not fitted. Please run {self.fit_transform.__name__}() first.')
+        else:
+            raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
 
     @property
     def x_data(self):

@@ -3,8 +3,8 @@ Classification
 """
 
 import argparse
-from src.data_visualization import viz_occurrences
-from bisect import bisect_left
+from src.data_visualization import viz_occurrences_hm
+from helpers import *
 from src.data_picker import *
 import pandas as pd
 import numpy as np
@@ -19,6 +19,21 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
+from sklearn.feature_selection import SelectKBest
+
+
+def select_k_best_2(vocabularies, features_df, labels, k_best):
+    best_k_words = SelectKBest(k=k_best)
+    best_k_words.fit(features_df, labels)
+    best_k_words_idx = best_k_words.get_support(indices=True)
+    best_k_words_list = []
+    for i in best_k_words_idx:
+        for vocabulary in vocabularies:
+            for k, v in vocabulary.items():
+                if v == i:
+                    best_k_words_list.append(k)
+
+    return {'Classifier-Irrelevant': best_k_words_list}
 
 
 def select_k_best(coefs_dict, feature_names, k_best):
@@ -33,7 +48,7 @@ def select_k_best(coefs_dict, feature_names, k_best):
         k_top_argmax = np.argpartition(importances, -k_best)[-k_best:]
         # sort them in descending order according to their importances
         top_k_sorted = k_top_argmax[np.argsort(importances[k_top_argmax])][::-1]
-        best_k_features[clf_name] = feature_names[top_k_sorted]
+        best_k_features[clf_name] = feature_names[top_k_sorted].tolist()
 
     return best_k_features
 
@@ -73,6 +88,7 @@ def plot_confusion_matrix(cm, classes,
 
 def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
                     verbose=1, results_path=None, plots_path=None,
+                    scale_coefficients=False,
                     cm_title='Confusion Matrix'):
     """
     Runs multiple classifiers on data in dataFrame (or in X/Y if given) and prints the results.
@@ -85,6 +101,7 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
     :param verbose: Debug level
     :param results_path: Path to save results (only if verbose > 2)
     :param plots_path: Path to save plots (only if verbose > 2)
+    :param scale_coefficients: Whether to scale classifier's coefficients or not. Should scale if features are not.
     :param cm_title: Confusion matrix title
     :return: None
     """
@@ -113,7 +130,10 @@ def run_classifiers(dataframe=None, X=None, y=None, k_fold=10, classes=None,
             scores_, all_actual, all_predicted = classify(clf, k_fold, X, y)
             scores_avg = np.mean(scores_)
             scores[clf.__class__.__name__] = scores_
-            coefficients[clf.__class__.__name__] = np.std(X, axis=0) * clf.coef_[0]
+            if scale_coefficients:
+                coefficients[clf.__class__.__name__] = np.std(X, axis=0) * clf.coef_[0]
+            else:
+                coefficients[clf.__class__.__name__] = np.std(X, axis=0)
 
             if verbose > 1:
                 print_log(f'({datetime.now() - classification_ts})', file=results_path)
@@ -193,23 +213,8 @@ def classify(clf, K, X, y):
     return scores, all_actual, all_predicted
 
 
-def sort_a_by_b(a, b):
-    res = []
-    a_sorted = sorted(a)
-    for item in b:
-        found = bisect_left(a_sorted, item)
-        if found < len(a_sorted) and a_sorted[found] == item:
-            del a_sorted[found]
-            res.append(item)
-
-    for item in a_sorted:
-        res.append(item)
-
-    return res
-
-
 if __name__ == '__main__':
-    SELECT_K_BEST = 50
+    SELECT_K_BEST = (50, 0)  # 2 METHODS FOR K BEST (choose k for each. 0 means don't perform selection)
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--verbose", default=3, type=int, help="Verbose level [0-3]")
@@ -239,16 +244,15 @@ if __name__ == '__main__':
         FeatureVectorValues.TFIDF
     ]
 
+    current_results_root = RESULTS_DIR / datetime.now().strftime(DATE_STR_SHORT)
+    current_results_root.mkdir(parents=True)
     for data_type in data_types:
         for feature_vector_type in feature_vector_types:
             for feature_vector_values in feature_vector_value_types:
 
                 ts = datetime.now()
                 print(ts)
-                results_path = RESULTS_DIR
-                results_path.mkdir(exist_ok=True)
-                plots_path = results_path
-                results_path /= f'{ts.strftime(DATE_STR_SHORT)} results.txt'
+                current_results_file_path = current_results_root / f'{ts.strftime(DATE_STR_SHORT)} results.txt'
 
                 if data_type == ClassesType.BINARY_NATIVITY:
                     chunks_per_class = 500
@@ -261,8 +265,8 @@ if __name__ == '__main__':
 
                 config = f'{data_type}\n{feature_vector_type}\n{feature_vector_values}\n{chunks_per_class} chunks per class'
                 print(config)
-                if verbose > 0 and results_path:
-                    with open(results_path, mode='a', encoding='utf8') as f:
+                if verbose > 0 and current_results_file_path:
+                    with open(current_results_file_path, mode='a', encoding='utf8') as f:
                         f.write(f'{config}\n')
 
                 print('Collecting data...', end=' ')
@@ -283,21 +287,36 @@ if __name__ == '__main__':
 
                 print('Classifying...')
                 scores_dict, coefs_dict = run_classifiers(X=features_df, y=labels.values, verbose=verbose,
-                                                          results_path=results_path,
-                                                          plots_path=plots_path,
-                                                          classes=sort_a_by_b(pd.unique(labels), COUNTRIES_ORDER),
+                                                          results_path=current_results_file_path,
+                                                          plots_path=current_results_root,
+                                                          classes=sort_a_by_b(pd.unique(labels), COUNTRIES_FAM_ORDER),
+                                                          scale_coefficients=feature_vector_value_types == FeatureVectorValues.BINARY,
                                                           cm_title=config)
 
-                if SELECT_K_BEST:
+                if any(SELECT_K_BEST):
                     print('Getting best features...')
-                    best_features = select_k_best(coefs_dict, features_df.columns, SELECT_K_BEST)
-                    for clf_name, best_k_ftrs in best_features.items():
-                        print_k_best = f"{clf_name} best {SELECT_K_BEST} features (most to least important):\n" \
-                                       f"{', '.join(best_k_ftrs.tolist())}\n"
-                        print_log(print_k_best, file=results_path)
-                        print('Drawing heatmap...')
-                        if data_type != ClassesType.BINARY_NATIVITY:
-                            viz_occurrences(best_k_ftrs, labels, data_setups, show=False, save=True)
 
-                print(f'Results:\n{RESULTS_DIR}')
+                    best_features_ = [None, None]
+
+                    if SELECT_K_BEST[0]:
+                        #  Features are most to least important
+                        best_features_[0] = select_k_best(coefs_dict, features_df.columns, SELECT_K_BEST[0])
+                    if SELECT_K_BEST[1]:
+                        #  Features are NOT most to least important. Order is RANDOM.
+                        best_features_[1] = select_k_best_2([data_setup.get_vocabulary() for data_setup in data_setups],
+                                                            features_df, labels, SELECT_K_BEST[1])
+
+                    for i, best_features in enumerate(best_features_):
+                        if not best_features: continue
+                        print(f'SELECT K BEST [METHOD {i+1}]')
+                        for clf_name, best_k_ftrs in best_features.items():
+                            print_k_best = f"{clf_name} best {SELECT_K_BEST[i]} features:\n" \
+                                           f"{', '.join(best_k_ftrs)}\n"
+                            print_log(print_k_best, file=current_results_file_path)
+                            print('Drawing heatmap...')
+                            if data_type != ClassesType.BINARY_NATIVITY:
+                                viz_occurrences_hm(best_k_ftrs, labels, data_setups, current_results_root,
+                                                   show=False, save=True)
+
+                print(f'Results:\n{current_results_root}')
                 print(f'TOTAL TIME: {datetime.now() - ts}\n')

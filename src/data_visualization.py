@@ -14,6 +14,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from src.model_configuration import SetupClass  # just for type hinting
 import plotly.figure_factory as ff
 from datetime import datetime
+from helpers import sort_a_by_b
 
 
 def new_figure(title, xlabel, ylabel, x, y):
@@ -69,33 +70,37 @@ def _scale(column, new_range):
     return (((column - old_range[0]) * (new_range[1] - new_range[0])) / (old_range[1] - old_range[0])) + new_range[0]
 
 
-def viz_occurrences(k_best, classes, data_setups: List[SetupClass], show=True, save=False):
-    features_df = pd.DataFrame()
+def viz_occurrences_hm(best_k_features, classes, data_setups: List[SetupClass], outputdir, show=True, save=False):
+    features_df = pd.DataFrame(dtype=int)
     for data_setup in data_setups:
         # get features specific to this vectorizer
-        vocabulary = sorted(set(k_best) & set(data_setup.get_features()))
+        vocabulary = sorted(set(best_k_features) & set(data_setup.get_features()))
         vectorizer = CountVectorizer(vocabulary=vocabulary, ngram_range=data_setup.ngrams)
         features_df = pd.concat([features_df,
-                                 pd.DataFrame(vectorizer.fit_transform(data_setup.x_data).toarray(), columns=vocabulary)],
+                                 pd.DataFrame(vectorizer.fit_transform(data_setup.x_data).toarray(),
+                                              columns=vocabulary, dtype=int)],
                                 axis=1)
     features_df.index = classes.values
+
     # prepare heat map
     hm = features_df.groupby(features_df.index).sum()
+    hm = hm.reindex(sort_a_by_b(hm.index, COUNTRIES_FAM_ABC_ORDER))
+    hm_display = ((hm / hm.sum()).fillna(0) * 100).round(1)
     # display it
     fig = ff.create_annotated_heatmap(z=(hm.apply(lambda col: _scale(col, (0, 1)))).values,
-                                      annotation_text=hm.values,
-                                      text=hm.values,
+                                      annotation_text=hm_display.values,
+                                      text=hm_display.values,
                                       x=hm.columns.to_list(),
                                       y=hm.index.to_list(),
                                       hoverinfo='x+y+text',
                                       colorscale='Blues')
     fig['layout']['yaxis']['autorange'] = "reversed"
-    fig.update_layout(title=dict(text='Heatmap', y=0.03, x=0.5, xanchor='center', yanchor='bottom'),
+    fig.update_layout(title=dict(text='Heatmap (%)', y=0.03, x=0.5, xanchor='center', yanchor='bottom'),
                       title_font=dict(size=24),
                       xaxis_title='Best Features',
                       yaxis_title='Classes')
     if save:
-        fig.write_html(str(RESULTS_DIR / f'{datetime.now().strftime(DATE_STR_SHORT)} hm.html'))
+        fig.write_html(str(outputdir / f'{datetime.now().strftime(DATE_STR_SHORT)} hm.html'))
     if show:
         fig.show()
 

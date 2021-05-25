@@ -150,7 +150,7 @@ class DataPicker:
             elif classes_type == ClassesType.COUNTRY_IDENTIFICATION:
                 countries = DataPicker._get_country_classes(vocabulary_setup.chunks_dir,
                                                             chunks_per_country=chunks_per_class,
-                                                            countries_set=set(COUNTRIES_ORDER))  # not all countries
+                                                            countries_set=set(COUNTRIES_FAM_ORDER))  # not all countries
                 df = pd.DataFrame(sum(countries.values(), []), columns=['chunks'])
                 df['label'] = [country for country, chunks in countries.items() for _ in range(len(chunks))]
                 vocabulary_setup.data = df.sample(frac=1, random_state=SEED).reset_index(drop=True)

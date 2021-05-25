@@ -14,49 +14,53 @@ import random
 from my_random import SEED
 
 
-def clean_a_line(line):
+def clean_a_line(line, eng_words, remove_non_eng_words=False):
+    def remove_non_eng(text):
+        return " ".join(w for w in nltk.wordpunct_tokenize(text) if w.lower() in eng_words or not w.isalpha())
+
     def remove_emojis(text):
         return emoji.get_emoji_regexp().sub(r'', text)
 
-    line = re.sub(r'\(?http\S+\)?', '', remove_emojis(line)).strip()
+    line = re.sub(r'\(?http\S+\)?', '', remove_emojis(line))
+    if remove_non_eng_words:
+        line = remove_non_eng(line)
+    line = line.strip()
     if all([ch in string.punctuation for ch in list(line)]):
         line = ''
     return line.replace('[removed]', '').replace('[deleted]', '')
 
 
 def clean_data(params):
-    input_dir, input_files, output_dir = params
+    input_dir, input_files, output_dir, eng_words = params
     for filename in input_files:
         if filename.endswith('.txt'):
             print(filename)
             with open(input_dir / filename, mode='r', encoding='utf-8') as fr:
                 with open(output_dir / filename, mode='w', encoding='utf-8') as fw:
                     for line in fr.readlines():
-                        clean_line = clean_a_line(line)
+                        clean_line = clean_a_line(line, eng_words)
                         if clean_line:
                             fw.write(f'{clean_line}\n')
 
 
 def sentecize_data(input_dir, output_dir, shuffle=False):
-    sentences = []
+    sentence_ptrn = r"(?<=[A-Za-z][A-Za-z])[.?\n!]+|(?<=[0-9)\}\]])[.?\n!]+"
     for i, filename in enumerate(os.listdir(input_dir)):
+        sentences = []
         if filename.endswith('.txt'):
             print(f'{i + 1}. {filename}')
             with open(input_dir / filename, mode='r', encoding='utf-8') as fr:
-                with open(output_dir / filename, mode='w', encoding='utf-8') as fw:
-                    for line in fr.readlines():
-                        for sentence in re.split(r"(?<=[A-Za-z][A-Za-z])[.?\n!]+|(?<=[0-9)\}\]])[.?\n!]+", line):
-                            stripped_sentence = sentence.strip()
-                            if len(stripped_sentence) > 2:
-                                if shuffle:
-                                    sentences.append(stripped_sentence)
-                                else:
-                                    fw.write(f'{stripped_sentence}\n')
-    if shuffle:
-        random.seed(SEED)
-        random.shuffle(sentences)
-        for sentence in sentences:
-            fw.write(f'{sentence}\n')
+                for line in fr.readlines():
+                    for sentence in re.split(sentence_ptrn, line):
+                        stripped_sentence = sentence.strip()
+                        if len(stripped_sentence) > 2:
+                            sentences.append(stripped_sentence)
+            with open(output_dir / filename, mode='w', encoding='utf-8') as fw:
+                if shuffle:
+                    random.seed(SEED)
+                    random.shuffle(sentences)
+                for sentence in sentences:
+                    fw.write(f'{sentence}\n')
 
 
 def tokenize_data(input_dir, output_dir):
@@ -101,17 +105,20 @@ def chunkify_data(input_dir, output_dir, minimum_tokens_in_sentence=3, chunk_siz
 
 
 if __name__ == '__main__':
-    # ESTIMATED TOTAL TIME: 25.5 MINUTES
+    # ESTIMATED TOTAL TIME: 27 MINUTES
 
     CLEAN = True
-    SENTENCIZE, SHUFFLE = True, True
+    SENTECIZE, SHUFFLE = True, True
     TOKENIZE = True
     CHUNKIFY_TOKENS = True
     POSIFY = True
     CHUNKIFY_POS = True
 
+    estimated_time = round(CLEAN * 7 + SENTECIZE * 0.5 + TOKENIZE * 3 + CHUNKIFY_TOKENS * 0.5 + POSIFY * 11 + CHUNKIFY_POS * 0.5)
+
     ts = datetime.now()
     print(ts)
+    print(f'Estimated time: {estimated_time} minutes')
 
     input_dir = RAW_DATA_DIR
     clean_output_dir = CLEAN_DATA_DIR
@@ -123,13 +130,14 @@ if __name__ == '__main__':
 
     if CLEAN:
         # EST: 5 minutes
+        words = set(nltk.corpus.words.words())
         print('Cleaning...')
         clean_output_dir.mkdir(exist_ok=True)
         raw_files = [f for f in os.listdir(input_dir) if f.endswith('.txt')]
         print(f'{len(raw_files)} files...')
         pools = 6
         pool = Pool(pools)
-        file_groups = [(input_dir_, lst_of_files, output_dir) for input_dir_, output_dir, lst_of_files in
+        file_groups = [(input_dir_, lst_of_files, output_dir, words) for input_dir_, output_dir, lst_of_files in
                        zip([input_dir] * pools,
                            [clean_output_dir] * pools,
                            [raw_files[i: i+(len(raw_files)//(pools-1))]
@@ -138,7 +146,7 @@ if __name__ == '__main__':
         pool.map(clean_data, file_groups)
         print(f'{datetime.now()}\n')
 
-    if SENTENCIZE:
+    if SENTECIZE:
         # Quick
         print('Sentecizing...')
         sentences_output_dir.mkdir(exist_ok=True)
@@ -146,7 +154,7 @@ if __name__ == '__main__':
         print(f'{datetime.now()}\n')
 
     if TOKENIZE:
-        # 4 minutes
+        # 3 minutes
         print('Tokenizing...')
         tokens_output_dir.mkdir(exist_ok=True)
         tokenize_data(sentences_output_dir, tokens_output_dir)
