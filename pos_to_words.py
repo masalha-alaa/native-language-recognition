@@ -12,7 +12,7 @@ path_p = POS_CHUNKS_DIR
 path_t = TOKEN_CHUNKS_DIR
 
 country = 'Poland'
-tri = 'NN IN DT'
+tri = 'IN JJ NN'
 
 pos_chunks = load(open(path_p / f'{country}{PKL_LST_EXT}', mode='rb'))
 tok_chunks = load(open(path_t / f'{country}{PKL_LST_EXT}', mode='rb'))

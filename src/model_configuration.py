@@ -10,13 +10,20 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 
 class FtrVectorEnum(Enum):
+    """
+    Enum of feature vector types
+    """
+    # TODO: Move to FeatureVectorType?
     ONE_K_WORDS = 1 << 0
     ONE_K_POS_TRI = 1 << 1
     FUNCTION_WORDS = 1 << 2
 
 
 class FeatureVectorType(object):
-    __secret_key = object()
+    """
+    Enum-like class of feature vector types
+    """
+    __secret_key = object()  # a secret key to imitate a private constructor)
 
     def __init__(self, choice=None, name=None, value=None, secret_key=None):
         if isinstance(choice, FtrVectorEnum):
@@ -58,6 +65,9 @@ class FeatureVectorType(object):
 
 
 class FeatureVectorValues(Enum):
+    """
+    Enum of feature vector values filling method
+    """
     BINARY = 1
     FREQUENCY = 2
     TFIDF = 3
@@ -77,6 +87,9 @@ class SetupClass:
         self.fitted = False
 
     def load_vectorizer(self):
+        """
+        Load vocabulary and initialize vectorizer according to the features vector type.
+        """
         if self._feature_vector_values_type == FeatureVectorValues.BINARY:
             self._vectorizer = CountVectorizer(vocabulary=self._vocabulary, ngram_range=self._ngrams, binary=True)
         elif self._feature_vector_values_type == FeatureVectorValues.FREQUENCY:
@@ -85,6 +98,10 @@ class SetupClass:
             self._vectorizer = TfidfVectorizer(vocabulary=self._vocabulary, ngram_range=self._ngrams, use_idf=True)
 
     def fit_transform(self):
+        """
+        Fit and apply vectorizer on data.
+        # TODO: Add a boolean "train" option for fitting / fitting & transforming.
+        """
         if self._vectorizer is None:
             raise RuntimeError(f'Vectorizer not initialized. Please run {self.load_vectorizer.__name__}() first.')
         # TODO: Save fitted vectorizers.
@@ -92,6 +109,10 @@ class SetupClass:
         return self._vectorizer.fit_transform(self.x_data)
 
     def get_vocabulary(self):
+        """
+        :return: Vocabulary if vectorizer is fitted.
+        :raises: RuntimeError if vectorizer is not fitted yet.
+        """
         if self._vectorizer is not None:
             if self.fitted:
                 return self._vectorizer.vocabulary_
@@ -102,31 +123,54 @@ class SetupClass:
 
     @property
     def x_data(self):
+        """
+        A property to access the data without the labels.
+        """
         # TODO: Write this in a better way
         return self.data[self.data.columns[0]]
 
     @property
     def ngrams(self):
+        """
+        A property to access the ngrams.
+        """
         return self._ngrams
 
     def get_features(self):
+        """
+        :return: Vectorizer features in an ascending order.
+        """
         if self._vectorizer:
             return sorted(self._vectorizer.vocabulary_.keys(), key=lambda ftr: self._vectorizer.vocabulary_[ftr])
 
     @property
     def chunks_dir(self):
+        """
+        A property to access the chunks directory.
+        """
         return self._chunks_dir
 
     @chunks_dir.setter
     def chunks_dir(self, path):
+        """
+        A property to set the chunks directory.
+        """
         self._chunks_dir = path
 
     @property
     def data(self):
+        """
+        A property to access the data including the labels.
+        """
         return self._data
 
     @data.setter
     def data(self, the_data):
+        """
+        A property to set the data (including labels).
+        :param the_data: The data to set.
+        :type the_data: pd.DataFrame.
+        """
         self._data = the_data
 
 
@@ -150,6 +194,9 @@ class ModelConfiguration:
 
     @staticmethod
     def get_configuration(feature_vector_type: FeatureVectorType, feature_vector_vals: FeatureVectorValues):
+        """
+        Return model configuration according to features type.
+        """
         vocabularies = []
 
         if feature_vector_type & FtrVectorEnum.ONE_K_WORDS:

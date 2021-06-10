@@ -11,18 +11,27 @@ import plotly.express as px
 
 
 def k_most_common(input_dir, k=1000):
+    """
+    Return most K common words in the files in the input directory.
+    """
     top_k = Counter(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read().lower()
                             for filename in os.listdir(input_dir)).split())
     return top_k.most_common(k)
 
 
 def k_most_common_trigrams(input_dir, k=1000):
+    """
+    Return most K common trigrams in the files in the input directory.
+    """
     top_k = FreqDist(ngrams(''.join(open(input_dir / filename, mode='r', encoding='utf-8').read().lower()
                                     for filename in os.listdir(input_dir)).split(), 3))
     return top_k.most_common(k)
 
 
 def plot_interactive(title, x, y, x_label, y_label, xticks_rot=0, show=True, save=False):
+    """
+    Draw an interactive html plot of the given data.
+    """
     fig = px.line({x_label: x, y_label: y}, x=x_label, y=y_label, title=title)
     fig.update_layout(hovermode='x')
     fig.update_xaxes(tickangle=xticks_rot)

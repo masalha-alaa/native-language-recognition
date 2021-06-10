@@ -11,6 +11,9 @@ from src.model_configuration import *
 
 
 class ClassesType(Enum):
+    """
+    Enum of the type of classes to classify.
+    """
     BINARY_NATIVITY = 1
     COUNTRY_IDENTIFICATION = 2  # NLI
     LANGUAGE_FAMILY = 3
@@ -20,11 +23,23 @@ class ClassesType(Enum):
 
 
 class DataPicker:
+    """
+    A class for sampling data from files.
+    """
     NATIVE = 'Native'
     NON_NATIVE = 'Non-Native'
 
     @staticmethod
     def _sample_random_chunks(filepath, min_chunks=0, max_chunks=-1):
+        """
+        Get random chunks from given file.
+        :param filepath: The chunks file to sample from.
+        :param min_chunks: Minimum number of chunks to sample (an empty list is returned in case of not enough chunks).
+        :param max_chunks: Maximum number of chunks to sample.
+        Note: Pass equal values of min_chunks and max_chunks to request exact number of chunks (an empty list is
+        returned if not enough chunks were found).
+        :return: List of collected chunks.
+        """
         chunks = []
         with open(filepath, mode='rb') as f:
             chunks = load(f)
@@ -38,6 +53,14 @@ class DataPicker:
 
     @staticmethod
     def _get_native_non_native_classes(input_path, max_chunks_per_non_native_country=50, max_chunks_per_class=500):
+        """
+        Get data of native calsses and non-native classes.
+        :param input_path: Input directory to read data from.
+        :param max_chunks_per_non_native_country: Maximum number of chunks to sample from each non native country.
+        :param max_chunks_per_class: Maximum number of chunks to sample from each country (native and non-native treated
+        alike).
+        :return: list of native chunks, list of non-native chunks
+        """
         min_chunks = min(20, max_chunks_per_non_native_country)
 
         native_chunks = []
@@ -65,6 +88,15 @@ class DataPicker:
 
     @staticmethod
     def _get_country_classes(input_path, chunks_per_country=50, countries_set=None):
+        """
+        Get classes of countries set.
+        :param input_path: Directory to read data from.
+        :param chunks_per_country: How many chunks to sample from each country (countries of not enough chunks are
+        dismissed).
+        :param countries_set: A set of country names to consider (countries not in countries_set are ignored). Pass
+        None to consider all available countries.
+        :return: A dictionary of {country name: chunks list}
+        """
         d = {}
         for chunks_file in os.listdir(input_path):
             if chunks_file.endswith(PKL_LST_EXT) and (countries_set is None or chunks_file.replace(PKL_LST_EXT, '') in countries_set):
@@ -77,6 +109,13 @@ class DataPicker:
 
     @staticmethod
     def _get_family_classes(input_path, max_chunks_per_country=80, chunks_per_fam=300):
+        """
+        Get classes of language families.
+        :param input_path: Directory to read data from.
+        :param max_chunks_per_country: Maximum number of chunks per country.
+        :param chunks_per_fam: Number of chunks per country family (families with not enough chunks are dismissed).
+        :return: Dictionary of {family name: list of chunks}
+        """
         min_chunks = min(20, max_chunks_per_country)
 
         d = defaultdict(list)  # defaultdict to return an empty list (zero len) if we didn't add the family yet
@@ -95,6 +134,10 @@ class DataPicker:
     @staticmethod
     def get_data(feature_vector_type: FeatureVectorType, feature_vector_values: FeatureVectorValues,
                  classes_type: ClassesType, chunks_per_class):
+        """
+        Get the data in a ModelConfiguration class, according to given configurations.
+        :return: ModelConfiguration of data, list of labels
+        """
 
         vocabulary_setups = ModelConfiguration.get_configuration(feature_vector_type, feature_vector_values)
 

@@ -15,6 +15,14 @@ from my_random import SEED
 
 
 def clean_a_line(line, eng_words, remove_non_eng_words=False):
+    """
+    Clean a single line.
+    :param line: The line to clean.
+    :type line: str.
+    :param eng_words: A list-like or generator of all the English words.
+    :param remove_non_eng_words: flag for removing non-english words (True for removing, False otherwise).
+    :return: The line after cleaning.
+    """
     def remove_non_eng(text):
         return " ".join(w for w in nltk.wordpunct_tokenize(text) if w.lower() in eng_words or not w.isalpha())
 
@@ -31,6 +39,12 @@ def clean_a_line(line, eng_words, remove_non_eng_words=False):
 
 
 def clean_data(params):
+    """
+    Clean the data in the input files, and save in the given output directory.
+    :param params: Input parameters: input directory path, input filenames (not complete path), output directory, list of English words
+    :type params: tuple.
+    :return: None
+    """
     input_dir, input_files, output_dir, eng_words = params
     for filename in input_files:
         if filename.endswith('.txt'):
@@ -44,6 +58,13 @@ def clean_data(params):
 
 
 def sentecize_data(input_dir, output_dir, shuffle=False):
+    """
+    Break text files into sentences and save them to the given output directory.
+    :param input_dir: Input directory.
+    :param output_dir: Output directory.
+    :param shuffle: Whether to shuffle the sentences before saving or not.
+    :return: None
+    """
     sentence_ptrn = r"(?<=[A-Za-z][A-Za-z])[.?\n!]+|(?<=[0-9)\}\]])[.?\n!]+"
     for i, filename in enumerate(os.listdir(input_dir)):
         sentences = []
@@ -64,6 +85,12 @@ def sentecize_data(input_dir, output_dir, shuffle=False):
 
 
 def tokenize_data(input_dir, output_dir):
+    """
+    Break the sentences in the input files to tokens, and save them to the given output directory.
+    :param input_dir: Input directory.
+    :param output_dir: Output directory.
+    :return: None
+    """
     for i, filename in enumerate(os.listdir(input_dir)):
         if filename.endswith('.txt'):
             print(f'{i + 1}. {filename}')
@@ -74,6 +101,9 @@ def tokenize_data(input_dir, output_dir):
 
 
 def posify_data(params):
+    """
+    Convert (tag) tokenized data to POS (part of speach) and save to the given output dir.
+    """
     input_dir, input_files, output_dir = params
     for filename in input_files:
         if filename.endswith('.txt'):
@@ -84,6 +114,15 @@ def posify_data(params):
 
 
 def chunkify_data(input_dir, output_dir, minimum_tokens_in_sentence=3, chunk_size=2000):
+    """
+    Make chunks of given size.
+    :param input_dir: Input direcctory of data to chunkify.
+    :param output_dir: Output directory for saving.
+    :param minimum_tokens_in_sentence: Minimum tokens in each sentence.
+    :param chunk_size: Approximate size of each chunk (in number words). Approximate because a sentence won't be cut in
+    the middle.
+    :return: None
+    """
     for i, filename in enumerate(os.listdir(input_dir)):
         if filename.endswith('.txt'):
             print(f'{i + 1}. {filename}')
@@ -128,6 +167,11 @@ if __name__ == '__main__':
     pos_chunks_output_dir = POS_CHUNKS_DIR
     pos_output_dir = POS_DIR
 
+    """
+    Perform the enabled steps.
+    Use parallelism to speed things up.
+    """
+
     if CLEAN:
         # EST: 5 minutes
         words = set(nltk.corpus.words.words())
@@ -135,7 +179,7 @@ if __name__ == '__main__':
         clean_output_dir.mkdir(exist_ok=True)
         raw_files = [f for f in os.listdir(input_dir) if f.endswith('.txt')]
         print(f'{len(raw_files)} files...')
-        pools = 6
+        pools = 6  # run multiple cores in parallel.
         pool = Pool(pools)
         file_groups = [(input_dir_, lst_of_files, output_dir, words) for input_dir_, output_dir, lst_of_files in
                        zip([input_dir] * pools,
@@ -173,7 +217,7 @@ if __name__ == '__main__':
         pos_output_dir.mkdir(exist_ok=True)
         tokenized_files = [f for f in os.listdir(tokens_output_dir) if f.endswith('.txt')]
         print(f'{len(tokenized_files)} files...')
-        pools = 6
+        pools = 6  # run multiple cores in parallel.
         pool = Pool(pools)
         file_groups = [(input_dir_, lst_of_files, output_dir) for input_dir_, output_dir, lst_of_files in
                        zip([tokens_output_dir] * pools,

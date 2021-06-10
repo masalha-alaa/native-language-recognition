@@ -14,6 +14,9 @@ from paths import *
 
 
 def extract_country(flair):
+    """
+    Extract country from user flair.
+    """
     if flair is not None and flair.strip():
         country = flair.split(': ')[-1]
         return country if re.match('[A-Za-z]+', country) else None
@@ -21,6 +24,9 @@ def extract_country(flair):
 
 
 def save_checkpoint(path, obj, filename=None):
+    """
+    Save checkpoint of object to path.
+    """
     if filename is None:
         path = path / f'checkpoint {datetime.now().strftime(DATE_STR_LONG)} data{PKL_LST_EXT}'
     else:

@@ -23,6 +23,11 @@ from sklearn.feature_selection import SelectKBest
 
 
 def select_k_best_2(vocabularies, features_df, labels, k_best):
+    """
+    Select K best features using sklearn's SelectKBest, which is based on the ANOVA F-value test:
+    https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html
+    :return: Best K features (unordered)
+    """
     best_k_words = SelectKBest(k=k_best)
     best_k_words.fit(features_df, labels)
     best_k_words_idx = best_k_words.get_support(indices=True)
@@ -37,6 +42,10 @@ def select_k_best_2(vocabularies, features_df, labels, k_best):
 
 
 def select_k_best(coefs_dict, feature_names, k_best):
+    """
+    Select K best features using the classifier's importance ratings.
+    :return: Best K features in a descending order.
+    """
     # assuming coefficients were scaled.
     # (right now they are scaled in 'run_classifiers()')
     # Source: https://stackoverflow.com/a/34052747/900394
@@ -244,6 +253,7 @@ if __name__ == '__main__':
         FeatureVectorValues.TFIDF
     ]
 
+    # Run over all active configurations and perform classification
     current_results_root = RESULTS_DIR / datetime.now().strftime(DATE_STR_SHORT)
     current_results_root.mkdir(parents=True)
     for data_type in data_types:

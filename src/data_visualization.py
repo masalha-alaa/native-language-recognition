@@ -18,6 +18,9 @@ from helpers import sort_a_by_b
 
 
 def new_figure(title, xlabel, ylabel, x, y):
+    """
+    Open a new empty figure
+    """
     fig = plt.gcf()
     plt.title(title)
     plt.xticks(rotation=90)
@@ -30,6 +33,9 @@ def new_figure(title, xlabel, ylabel, x, y):
 
 
 def sentences_count(input_dir, output_dir, show=True, save=False):
+    """
+    Create a plot of number of sentences of each country in the input directory.
+    """
     x,y = [],[]
     for country_file in os.listdir(input_dir):
         if country_file.endswith('.txt'):
@@ -47,6 +53,9 @@ def sentences_count(input_dir, output_dir, show=True, save=False):
 
 
 def median_sentence_len(input_dir, output_dir, method='average', show=True, save=False):
+    """
+    Create a plot of the median of the number of sentences of each country in the input directory.
+    """
     def apply_method(lst): return np.mean(lst) if method == 'average' else np.median(lst)
 
     x,y = [],[]
@@ -66,11 +75,17 @@ def median_sentence_len(input_dir, output_dir, method='average', show=True, save
 
 
 def _scale(column, new_range):
+    """
+    Scale list of values to a given range (the original range is assumed to be [min(column), max(column)]).
+    """
     old_range = (column.min(), column.max())
     return (((column - old_range[0]) * (new_range[1] - new_range[0])) / (old_range[1] - old_range[0])) + new_range[0]
 
 
 def viz_occurrences_hm(best_k_features, classes, data_setups: List[SetupClass], outputdir, show=True, save=False):
+    """
+    Create a heatmap of features occurrences per classs.
+    """
     features_df = pd.DataFrame(dtype=int)
     for data_setup in data_setups:
         # get features specific to this vectorizer
@@ -108,6 +123,9 @@ def viz_occurrences_hm(best_k_features, classes, data_setups: List[SetupClass], 
 
 
 def chunks_count(input_dir, output_dir, show=True, save=False):
+    """
+    Create a plot of the number chunks of each country in the input directory.
+    """
     x,y = [],[]
     for country_file in os.listdir(input_dir):
         if country_file.endswith(PKL_LST_EXT):

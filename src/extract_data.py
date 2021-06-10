@@ -11,6 +11,7 @@ if __name__ == '__main__':
     output_dir = RAW_DATA_DIR
     output_dir.mkdir(exist_ok=True)
 
+    # iterate on input pkl files, extract the text and write to new text files.
     with open(input_dir / input_file, mode='rb') as f:
         data = load(f)
         failed = []
