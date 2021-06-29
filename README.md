@@ -52,7 +52,10 @@ It's also worth mentioning that the authors have relied solely on lexical / synt
 
 
 Hereby I try to reproduce the authors' results with my own model.
-Before starting, it's worth mentioning that the task of native language identification from reddit posts would not be an easy one for a human (rather than a computer), since according to the authors' findings, the non-native reddit posters are at a near-native English level (even higher than advanced TOEFL learners). This assesment was done using various measures such as type-to-token ratio (TTR), average age-of-acquisition of lexical items, and mean word rank.
+Before starting, it's worth mentioning that the task of native language identification from reddit posts would not be an easy one for a human (rather than a computer), since according to the authors' findings, the non-native reddit posters are at a near-native English level (even higher than advanced TOEFL learners). This assesment was done using various measures such as type-to-token ratio (TTR), average age-of-acquisition of lexical items, and mean word rank, but it's also a well known fact among redditors:
+
+![image](https://user-images.githubusercontent.com/78589884/123857243-bac10d80-d92a-11eb-9d0a-e044f61c5d76.png)
+
 
 ### My Results TLDR
 My own results for Tasks 1,2,3 are: 93%, 57.7%, 77.3% respectively.
