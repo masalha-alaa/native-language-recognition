@@ -2,7 +2,7 @@
 # Native Language Recognition
 This project is an attempt to implement the integral part of the paper **Native Language Cognate Effects on Second Language Lexical Choice** [[1]](#1), in which the authors try to distinguish the native languages of Reddit posters, relying on their Reddit posts which were written in English, using Machine Learning (ML) and Natural Languages Processing (NLP).
 
-Although the authors have released both their dataset and cleanup code publicly, I've created this project from scratch, including fetching (and cleaning) the reddit posts using the PRAW library [[3]](#3) by myself.
+Although the authors have released both their dataset and [cleanup code](https://github.com/ellarabi/reddit-l2) publicly, I've created this project from scratch, including fetching (and cleaning) the reddit posts using the PRAW library [[3]](#3) by myself.
 The choice of the subreddits to fetch the data from is based on several aspects, such as mother tongue variety and, most importantly, labels. The authors have picked subreddits that the user **flair tag** is almost guaranteed<sup>1</sup> to be their country of origin (e.g. Germany / US / Spain / etc.), so they could use them as the ground truth labels.
 It's worth mentioning, however, that the authors' dataset is much larger than mine (8GB vs. 111MB). The size differences are due to several reasons:
 1. I have used only 2 subreddits (r/AskEurope, r/Europe), whereas the authors have used an additional 3: r/EuropeanCulture, r/EuropeanFederalists r/Eurosceptics.
