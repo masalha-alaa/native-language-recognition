@@ -3,7 +3,7 @@
 I decided to re-implement the project using a deep learning approach with PyTorch, and compare the results with the regular machine learning approach I had taken before.
 I tried and compared a few neural networks such as FC / RNN (LSTM / GRU) (with and without Embedding). The FC network performed well in the simpler Binary Classification task, whereas the RNN networks performed significantly better in the more challenging tasks. The embedding layer did not help at all, so I didn't include it in the results (but it can be found in the code). I compiled the best results in the following table:
 
-| Classifier                      | Binary Nativity Classification  | 24 Languages Classification | 4 Language Families Classification |
+| Classifier                      | Binary Nativity Classification  | 24 Countries Classification | 4 Language Families Classification |
 | ---                             | ---                             | --------------------------- | ---------------------------------- |
 | Logistic Regression Classifier  | 93%                             | 58%                         | 77%                                |
 | FC                              | 95%                             | 4%                          | 70%                                |
