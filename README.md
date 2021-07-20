@@ -4,12 +4,12 @@ I decided to re-implement the project using a deep learning approach with PyTorc
 I tried and compared a few neural networks such as FC / RNN (LSTM / GRU) (with and without Embedding). The FC network performed well in the simpler Binary Classification task, whereas the RNN networks performed significantly better in the more challenging tasks. The embedding layer did not help at all, so I didn't include it in the results (but it can be found in the code). I compiled the best results in the following table (evaluation was done using a 6-fold cross validation):
 
 | Classifier                      | Binary Nativity Classification  | 24 Countries Classification | 4 Language Families Classification |
-| ---                             | ---                             | --------------------------- | ---------------------------------- |
+| ---                             | ---                             | ---                         | ---                                |
 | Logistic Regression Classifier  | 93%                             | 58%                         | 77%                                |
 | FC                              | 95%                             | 4%                          | 70%                                |
-| RNN                             | 95%                             | 67%                         | 85%                                |
+| RNN                             | 95%                             | 62%                         | 84%                                |
 
-As can be seen in the table above, the Fully Connected (FC) network was good enough for the Binary Classificaiton, but was significantly out-performed by the RNN network in the other more complex tasks. The most notable thing in this table is that RNN (deep learning) out-performed the regular Machine Learning approach (Logistic Regression Classifier) by more than 6% points on average.
+As can be seen in the table above, the Fully Connected (FC) network was good enough for the Binary Classificaiton, but was significantly out-performed by the RNN network in the other more complex tasks. The most notable thing in this table is that RNN (deep learning) out-performed the regular Machine Learning approach (Logistic Regression Classifier) by about 4% points on average.
 
 It's worth mentioning that I used the same feature encoding method in both approaches (the regular machine learning approach, and the deep learning approach), as I used a list of common English function words and the top 1000 POS trigrams in the corpus, and encoded them to their tf-idf values.
 
