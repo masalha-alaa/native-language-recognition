@@ -3,7 +3,7 @@
 I decided to re-implement the project using a deep learning approach with PyTorch, and compare the results with the regular machine learning approach I had taken before.
 I tried and compared a few neural networks such as FC / RNN (LSTM / GRU) (with and without Embedding). The FC network performed well in the simpler Binary Classification task, whereas the RNN networks performed significantly better in the more challenging tasks. The embedding layer did not help at all, so I didn't include it in the results (but it can be found in the code). I compiled the best results in the following table (evaluation was done using a 6-fold cross validation):
 
-| Classifier                      | Binary Nativity Classification  | 24 Countries Classification | 4 Language Families Classification |
+| Classifier                      | Binary Nativity Classification  | 24 Languages Classification | 4 Language Families Classification |
 | ---                             | ---                             | ---                         | ---                                |
 | Logistic Regression Classifier  | 93%                             | 58%                         | 77%                                |
 | FC                              | 95%                             | 4%                          | 70%                                |
@@ -109,7 +109,7 @@ Moving on to the more interesting semantic-features results, here is the confusi
 
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20country%20identification%20fw%20%26%201k%20pos.png" alt="Country Identification FW & 1K POS TRI 53.7% accuracy" width="666">
 
-As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 53.7% (authors' is 60.8%). As explained earlier, the random chance baseline accuracy would be 4%, so 53% and 60% are very high accuracies compared to that ([click to see an interactive heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/9d055ede75b1da92bb42bb5c05baa4ef7c40fa2f/docs/2021-05-22%2018-32-37%20hm.html)).
+As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 53.7% (authors' is 60.8% with even more languages). As explained earlier, the random chance baseline accuracy for 24 languages would be 4%, so 53% is a very high accuracy compared to that ([click to see an interactive heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/9d055ede75b1da92bb42bb5c05baa4ef7c40fa2f/docs/2021-05-22%2018-32-37%20hm.html)).
 Also, notice that most errors occur between "close countries" (countries in the same language family) - such as all the English speaking countries, or the Romance-language countries, which leads us to the 3rd and final classification task.
 
 #### Task 3 - Language Family Classification
@@ -125,7 +125,6 @@ In this project I have successfully reproduced the authors' results in identifyi
 1. Database size (theirs is much larger).
 2. Database cleaning (for example, they replaced URLs with the URL token, whereas I simply removed them; and replaced non-English words with the UNK token, whereas I treated them as normal tokens).
 3. Their token tagging was more accurate, as a result of using Spacy[[5]](#5) for named entities identification, as well as the 'truecasing' technique to distinguish between abbreviations and regular words such as 'US' (United States) and 'us' (pronoun).
-4. The authors might have unified the English speaking countries into 1 class in the Language Classification task (Task 2). I did not do that because unfortuntaely I could not determine from the paper if they have actually done that or not. But obviously if I do this unification the results would be significantly higher in the Language Classfication task.
 
 ### Discalimer
 I personally know the authors of the paper, and they have guided me through a simplified version of this project back in my MSc studies, and now 4 years later as I'm more skillful and advanced in the ML field and in programming in general, I have decided to create it by my own from scratch.
