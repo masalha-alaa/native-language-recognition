@@ -3,9 +3,9 @@
 I decided to re-implement the project using a deep learning approach with PyTorch, and compare the results with the regular machine learning approach I had taken before.
 I tried and compared a few neural networks such as FC / RNN (LSTM / GRU) (with and without Embedding). The FC network performed well in the simpler Binary Classification task, whereas the RNN networks performed significantly better in the more challenging tasks. The embedding layer did not help at all, so I didn't include it in the results (but it can be found in the code). I compiled the best results in the following table (evaluation was done using a 6-fold cross validation):
 
-| Classifier                      | Binary Nativity Classification  | 24 Languages Classification | 4 Language Families Classification |
+| Classifier                      | Binary Nativity Classification  | 21 Languages Classification | 4 Language Families Classification |
 | ---                             | ---                             | ---                         | ---                                |
-| Logistic Regression Classifier  | 93%                             | 58%                         | 77%                                |
+| Logistic Regression Classifier  | 93%                             | 57%                         | 77%                                |
 | FC                              | 95%                             | 4%                          | 70%                                |
 | RNN                             | 95%                             | 62%                         | 84%                                |
 
@@ -53,7 +53,7 @@ In order to run the code, please follow the following steps:
 The authors have divided their work to 3 tasks:
 
 1. **Binary Nativity Classification:** Distinguish native vs. non-native English speakers.
-2. **Language Classification:** Detect the native language of the original poster, among 31 different languages <sup>2</sup>.
+2. **Language Classification:** Detect the native language of the original poster, among 31 different languages.
 3. **Language Family Classification:** Classify posts according to the poster's language family. Language families are:
 
 **English:** Australia, UK, New Zealand, US, Canada.
@@ -63,8 +63,6 @@ The authors have divided their work to 3 tasks:
 **Romance:** France, Italy, Mexico, Portugal, Romania, Spain.
 
 **Slavic:** Bosnia, Bulgaria, Croatia, Czech, Latvia, Lithuania, Poland, Russia, Serbia, Slovakia, Slovenia, Ukraine.
-
-<sup>2</sup>*Actually it's not clear to me whether it was 31 or 39+6 (45) from the paper. I went on with 31.*
 
 The authors report the following accuracy results for tasks 1,2,3 respectively: 90.8%, 60.8%, 82.5% (using 10 fold cross validation).<br>
 It's also worth mentioning that the authors have relied solely on lexical / syntactic features, opposed to context and social network features which they have mentioned in their other paper [[2]](#2). For example some of the features they mention are part of speech (POS) ngrams, function words, and most common words in the database. This is important mainly because the task of the paper (as its title implies) is to recognize the cognate effects of the posters' first language (L1) that are reflected on their second language (L2). I.e. they hypothesize that the effect of L1 is so powerful (in means of word and grammar choice) that it's clearly reflected on L2. For example (from my findings), it turns out that Polish people use the combination "IN JJ NN" ('Preposition' 'Adjective' 'Singular Noun') way more often than native English speakers do, and "NN IN DT" trigrams ('Singular Noun' 'Preposition', 'Determiner') way less. An example of the former is: _"in old building"_ in the sentence:
@@ -78,7 +76,7 @@ Before starting, it's worth mentioning that the task of native language identifi
 
 
 ### My Results TLDR
-My own results for Tasks 1,2,3 are: 93%, 57.7%, 77.3% respectively.
+My own results for Tasks 1,2,3 are: 93%, 57.1%, 77.3% respectively.
 
 ---
 
@@ -95,7 +93,7 @@ Although this has achieved a very high accuracy, it is an expected and not a ver
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20binary%20nativity%20fw%20%26%201k%20pos.png" alt="Binary Nativity Confusion Matrix, 93% accuracy" width="666">
 
 #### Task 2 - Language Classification
-Once again, using the top 1000 words binary features, I achieved very good results (87% accuracy). Note that a baseline random chance classifier would have a **1/24=4%** accuracy.
+Once again, using the top 1000 words binary features, I achieved very good results (87% accuracy). Note that a baseline random chance classifier would have a **1/21=4.7%** accuracy.
 
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20country%20identification%201k%20words.png" alt="Country Confusion Matrix, 1K words, binary, 87% accuracy, 93% accuracy" width="666">
 
@@ -107,10 +105,12 @@ This is a column-wise heatmap, in which the rows are classes (countries) and the
 
 Moving on to the more interesting semantic-features results, here is the confusion matrix of country classification, using only common function words and the top 1000 POS trigrams:
 
-<img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20country%20identification%20fw%20%26%201k%20pos.png" alt="Country Identification FW & 1K POS TRI 53.7% accuracy" width="666">
+<img src="https://user-images.githubusercontent.com/78589884/126445329-2137c27b-976c-439d-96e7-7f908f19c2ec.png" alt="Country Identification FW & 1K POS TRI 53.7% accuracy" width="666">
 
-As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 53.7% (authors' is 60.8% with even more languages). As explained earlier, the random chance baseline accuracy for 24 languages would be 4%, so 53% is a very high accuracy compared to that ([click to see an interactive heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/9d055ede75b1da92bb42bb5c05baa4ef7c40fa2f/docs/2021-05-22%2018-32-37%20hm.html)).
-Also, notice that most errors occur between "close countries" (countries in the same language family) - such as all the English speaking countries, or the Romance-language countries, which leads us to the 3rd and final classification task.
+<!-- <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20country%20identification%20fw%20%26%201k%20pos.png" alt="Country Identification FW & 1K POS TRI 53.7% accuracy" width="666"> -->
+
+As can be seen in the confusion matrix above, I have achieved a satisfying accuracy of 57.1% (authors' is 60.8% with even more languages). As explained earlier, the random chance baseline accuracy for 21 languages would be 4.7%, so 57% is a very high accuracy compared to that ([click to see an interactive heatmap of the best features selected by the classifier _(produced by Plotly)_](https://rawcdn.githack.com/masalha-alaa/native-language-recognition/9d055ede75b1da92bb42bb5c05baa4ef7c40fa2f/docs/2021-05-22%2018-32-37%20hm.html)).
+Also, notice that most errors occur between "close countries" (countries in the same language family) - such as the English speaking countries, or the Romance-language countries, which leads us to the 3rd and final classification task.
 
 #### Task 3 - Language Family Classification
 In this task I try to classify the languages into 4 language families: [English](English "Australia, UK, New Zealand, US, Canada") / [Germanic](Germanic "Austria, Denmark, Germany, Iceland, Netherlands, Norway, Sweden") / [Romance](Romance "France, Italy, Mexico, Portugal, Romania, Spain") / [Slavic](Slavic "Bosnia, Bulgaria, Croatia, Czech, Latvia, Lithuania, Poland, Russia, Serbia, Slovakia, Slovenia, Ukraine") _(hover to see details - link is not active)._
