@@ -121,6 +121,7 @@ Using the same features that I had used in the other 2 tasks (function words and
 
 ### Teaser
 Finally, here's a teaser I made to show the classification process in action while analyzing the tokens in a text, and classifying it correctly as Italian. Each token is colored according to the language it mostly contributes to. Some tokens are analyzed **behind the scenes** according to their POS tags.
+
 ![promo - italian](https://user-images.githubusercontent.com/78589884/126782164-39dd1265-3ed8-41d0-a752-2ec3dcc40504.gif)
 
 ### Summary
