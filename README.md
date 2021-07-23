@@ -119,6 +119,9 @@ Using the same features that I had used in the other 2 tasks (function words and
 
 <img src="https://github.com/masalha-alaa/native-language-detection/blob/master/docs/images/cm%20family%20identification%20fw%20%26%201k%20pos.png" alt="Family Identification FW & 1K POS TRI 77.3% accuracy" width="666">
 
+### Teaser
+Finally, here's a teaser I made to show the classification process in action while analyzing the tokens in a text, and classifying it correctly as Italian. Each token is colored according to the language it mostly contributes to. Some tokens are analyzed **behind the scenes** according to their POS tags.
+![promo - italian](https://user-images.githubusercontent.com/78589884/126782164-39dd1265-3ed8-41d0-a752-2ec3dcc40504.gif)
 
 ### Summary
 In this project I have successfully reproduced the authors' results in identifying the original posters' native languages, using NLP techniques. The small differences in the results (in favor of the authors) might be due to various reasons, including but not limited to:
