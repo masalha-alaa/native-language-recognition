@@ -11,7 +11,7 @@ I tried and compared a few neural networks such as FC / RNN (LSTM / GRU) (with a
 
 As can be seen in the table above, the Fully Connected (FC) network was good enough for the Binary Classificaiton, but was significantly out-performed by the RNN network in the other more complex tasks. The most notable thing in this table is that RNN (deep learning) out-performed the regular Machine Learning approach (Logistic Regression Classifier) by about 4% points on average.
 
-It's worth mentioning that I used the same feature encoding method in both approaches (the regular machine learning approach, and the deep learning approach), as I used a list of common English function words and the top 1000 POS trigrams in the corpus, and encoded them to their tf-idf values.
+In the classic ML approach I used a list of common English function words and the top 1000 POS trigrams in the corpus, and encoded them to their tf-idf values.
 
 Please find the notebook [native_language_classification_dl.ipynb](https://github.com/masalha-alaa/native-language-recognition/blob/master/native_language_classification_dl.ipynb) for a full walkthrough of my code in PyTorch (refresh if it doesn't load).
 
