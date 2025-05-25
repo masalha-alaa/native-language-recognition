@@ -13,7 +13,8 @@ As can be seen in the table above, the Fully Connected (FC) network was good eno
 
 In the classic ML approach I used a list of common English function words and the top 1000 POS trigrams in the corpus, and encoded them to their tf-idf values.
 
-Please find the notebook [native_language_classification_dl.ipynb](https://nbviewer.org/github/masalha-alaa/native-language-recognition/blob/master/native_language_classification_dl.ipynb) for a full walkthrough of my code in PyTorch.
+Please find the notebook [native_language_classification_dl.ipynb](https://colab.research.google.com/github/masalha-alaa/native-language-recognition/blob/master/native_language_classification_dl.ipynb
+) for a full walkthrough of my code in PyTorch.
 
 To find more about this project, please read the reamaining of this document.
 
